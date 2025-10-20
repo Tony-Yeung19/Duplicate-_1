@@ -1,0 +1,456 @@
+[
+  {
+    "name": "Goblin",
+    "size": "Small",
+    "type": "humanoid",
+    "subtype": "goblinoid",
+    "alignment": "neutral evil",
+    "armor_class": 15,
+    "armor_desc": "Leather Armor, Shield",
+    "hit_points": 7,
+    "hit_dice": "2d6",
+    "speed": {
+      "walk": 30
+    },
+    "abilities": {
+      "STR": 8,
+      "DEX": 14,
+      "CON": 10,
+      "INT": 10,
+      "WIS": 8,
+      "CHA": 8
+    },
+    "skills": {
+      "Stealth": 6
+    },
+    "senses": "Darkvision 60 ft., Passive Perception 9",
+    "languages": "Common, Goblin",
+    "challenge_rating": "1/4",
+    "role": "Skirmisher",
+    "description": "Small, black-hearted, selfish humanoids that crave power and regularly bully other creatures weaker than themselves.",
+    "actions": [
+      {
+        "name": "Scimitar",
+        "desc": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 5 (1d6 + 2) slashing damage.",
+        "attack_bonus": 4,
+        "damage_dice": "1d6",
+        "damage_bonus": 2
+      },
+      {
+        "name": "Shortbow",
+        "desc": "Ranged Weapon Attack: +4 to hit, range 80/320 ft., one target. Hit: 5 (1d6 + 2) piercing damage.",
+        "attack_bonus": 4,
+        "damage_dice": "1d6",
+        "damage_bonus": 2
+      }
+    ],
+    "special_abilities": [
+      {
+        "name": "Nimble Escape",
+        "desc": "The goblin can take the Disengage or Hide action as a bonus action on each of its turns."
+      }
+    ]
+  },
+  {
+    "name": "Wolf",
+    "size": "Medium",
+    "type": "beast",
+    "alignment": "unaligned",
+    "armor_class": 13,
+    "armor_desc": "Natural Armor",
+    "hit_points": 11,
+    "hit_dice": "2d8 + 2",
+    "speed": {
+      "walk": 40
+    },
+    "abilities": {
+      "STR": 12,
+      "DEX": 15,
+      "CON": 12,
+      "INT": 3,
+      "WIS": 12,
+      "CHA": 6
+    },
+    "skills": {
+      "Perception": 3,
+      "Stealth": 4
+    },
+    "senses": "Passive Perception 13",
+    "languages": "-",
+    "challenge_rating": "1/4",
+    "role": "Pack Hunter",
+    "description": "A wild predator that hunts in packs, using teamwork to take down larger prey.",
+    "actions": [
+      {
+        "name": "Bite",
+        "desc": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 7 (2d4 + 2) piercing damage. If the target is a creature, it must succeed on a DC 11 Strength saving throw or be knocked prone.",
+        "attack_bonus": 4,
+        "damage_dice": "2d4",
+        "damage_bonus": 2,
+        "save_dc": 11,
+        "save_ability": "STR"
+      }
+    ],
+    "special_abilities": [
+      {
+        "name": "Pack Tactics",
+        "desc": "The wolf has advantage on an attack roll against a creature if at least one of the wolf's allies is within 5 feet of the creature and the ally isn't incapacitated."
+      },
+      {
+        "name": "Keen Hearing and Smell",
+        "desc": "The wolf has advantage on Wisdom (Perception) checks that rely on hearing or smell."
+      }
+    ]
+  },
+  {
+    "name": "Zombie",
+    "size": "Medium",
+    "type": "undead",
+    "alignment": "neutral evil",
+    "armor_class": 8,
+    "armor_desc": "None",
+    "hit_points": 22,
+    "hit_dice": "3d8 + 9",
+    "speed": {
+      "walk": 20
+    },
+    "abilities": {
+      "STR": 13,
+      "DEX": 6,
+      "CON": 16,
+      "INT": 3,
+      "WIS": 6,
+      "CHA": 5
+    },
+    "damage_immunities": "Poison",
+    "condition_immunities": "Poisoned",
+    "senses": "Darkvision 60 ft., Passive Perception 8",
+    "languages": "Understands the languages it knew in life but can't speak",
+    "challenge_rating": "1/4",
+    "role": "Brute",
+    "description": "A mindless, shambling corpse animated by dark magic. It is slow but relentless and hard to put down.",
+    "actions": [
+      {
+        "name": "Slam",
+        "desc": "Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 4 (1d6 + 1) bludgeoning damage.",
+        "attack_bonus": 3,
+        "damage_dice": "1d6",
+        "damage_bonus": 1
+      }
+    ],
+    "special_abilities": [
+      {
+        "name": "Undead Fortitude",
+        "desc": "If damage reduces the zombie to 0 hit points, it must make a Constitution saving throw with a DC of 5 + the damage taken, unless the damage is radiant or from a critical hit. On a success, the zombie drops to 1 hit point instead."
+      }
+    ]
+  },
+  {
+    "name": "Orc",
+    "size": "Medium",
+    "type": "humanoid",
+    "subtype": "orc",
+    "alignment": "chaotic evil",
+    "armor_class": 13,
+    "armor_desc": "Hide Armor",
+    "hit_points": 15,
+    "hit_dice": "2d8 + 6",
+    "speed": {
+      "walk": 30
+    },
+    "abilities": {
+      "STR": 16,
+      "DEX": 12,
+      "CON": 16,
+      "INT": 7,
+      "WIS": 11,
+      "CHA": 10
+    },
+    "skills": {
+      "Intimidation": 2
+    },
+    "senses": "Darkvision 60 ft., Passive Perception 10",
+    "languages": "Common, Orc",
+    "challenge_rating": "1/2",
+    "role": "Berserker",
+    "description": "A savage, green-skinned raider with a lust for battle and conquest.",
+    "actions": [
+      {
+        "name": "Greataxe",
+        "desc": "Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 9 (1d12 + 3) slashing damage.",
+        "attack_bonus": 5,
+        "damage_dice": "1d12",
+        "damage_bonus": 3
+      },
+      {
+        "name": "Javelin",
+        "desc": "Melee or Ranged Weapon Attack: +5 to hit, reach 5 ft. or range 30/120 ft., one target. Hit: 6 (1d6 + 3) piercing damage.",
+        "attack_bonus": 5,
+        "damage_dice": "1d6",
+        "damage_bonus": 3
+      }
+    ],
+    "special_abilities": [
+      {
+        "name": "Aggressive",
+        "desc": "As a bonus action, the orc can move up to its speed toward a hostile creature that it can see."
+      }
+    ]
+  },
+  {
+    "name": "Owlbear",
+    "size": "Large",
+    "type": "monstrosity",
+    "alignment": "unaligned",
+    "armor_class": 13,
+    "armor_desc": "Natural Armor",
+    "hit_points": 59,
+    "hit_dice": "7d10 + 21",
+    "speed": {
+      "walk": 40
+    },
+    "abilities": {
+      "STR": 20,
+      "DEX": 12,
+      "CON": 17,
+      "INT": 3,
+      "WIS": 12,
+      "CHA": 7
+    },
+    "skills": {
+      "Perception": 5
+    },
+    "senses": "Darkvision 60 ft., Passive Perception 15",
+    "languages": "-",
+    "challenge_rating": "3",
+    "role": "Bruiser",
+    "description": "A terrifying hybrid of bear and owl, known for its ferocity and terrifying screech. It attacks anything it encounters.",
+    "actions": [
+      {
+        "name": "Multiattack",
+        "desc": "The owlbear makes two attacks: one with its beak and one with its claws."
+      },
+      {
+        "name": "Beak",
+        "desc": "Melee Weapon Attack: +7 to hit, reach 5 ft., one creature. Hit: 10 (1d10 + 5) piercing damage.",
+        "attack_bonus": 7,
+        "damage_dice": "1d10",
+        "damage_bonus": 5
+      },
+      {
+        "name": "Claws",
+        "desc": "Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 14 (2d8 + 5) slashing damage.",
+        "attack_bonus": 7,
+        "damage_dice": "2d8",
+        "damage_bonus": 5
+      }
+    ],
+    "special_abilities": [
+      {
+        "name": "Keen Sight and Smell",
+        "desc": "The owlbear has advantage on Wisdom (Perception) checks that rely on sight or smell."
+      }
+    ]
+  },
+  {
+    "name": "Mimic",
+    "size": "Medium",
+    "type": "monstrosity",
+    "alignment": "neutral",
+    "armor_class": 12,
+    "armor_desc": "Natural Armor",
+    "hit_points": 58,
+    "hit_dice": "9d8 + 18",
+    "speed": {
+      "walk": 15
+    },
+    "abilities": {
+      "STR": 17,
+      "DEX": 12,
+      "CON": 15,
+      "INT": 5,
+      "WIS": 13,
+      "CHA": 8
+    },
+    "skills": {
+      "Stealth": 5
+    },
+    "damage_immunities": "Acid",
+    "condition_immunities": "Prone",
+    "senses": "Darkvision 60 ft., Passive Perception 11",
+    "languages": "-",
+    "challenge_rating": "2",
+    "role": "Ambusher",
+    "description": "A cunning predator that can alter its shape to resemble an inanimate object, most often a chest or door, to lure prey.",
+    "actions": [
+      {
+        "name": "Pseudopod",
+        "desc": "Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 7 (1d8 + 3) bludgeoning damage. If the mimic is in object form, the target is subjected to its Adhesive trait.",
+        "attack_bonus": 5,
+        "damage_dice": "1d8",
+        "damage_bonus": 3
+      },
+      {
+        "name": "Bite",
+        "desc": "Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 7 (1d8 + 3) piercing damage plus 4 (1d8) acid damage.",
+        "attack_bonus": 5,
+        "damage_dice": "1d8 + 1d8",
+        "damage_bonus": 3
+      }
+    ],
+    "special_abilities": [
+      {
+        "name": "Shapechanger",
+        "desc": "The mimic can use its action to polymorph into an object or back into its true, amorphous form. Its statistics are the same in each form."
+      },
+      {
+        "name": "Adhesive (Object Form Only)",
+        "desc": "The mimic adheres to anything that touches it. A creature adhered to the mimic is also Grappled by it."
+      },
+      {
+        "name": "False Appearance (Object Form Only)",
+        "desc": "While the mimic remains motionless, it is indistinguishable from an ordinary object."
+      }
+    ]
+  },
+  {
+    "name": "Troll",
+    "size": "Large",
+    "type": "giant",
+    "alignment": "chaotic evil",
+    "armor_class": 15,
+    "armor_desc": "Natural Armor",
+    "hit_points": 84,
+    "hit_dice": "8d10 + 40",
+    "speed": {
+      "walk": 30
+    },
+    "abilities": {
+      "STR": 18,
+      "DEX": 13,
+      "CON": 20,
+      "INT": 7,
+      "WIS": 9,
+      "CHA": 7
+    },
+    "skills": {
+      "Perception": 2
+    },
+    "senses": "Darkvision 60 ft., Passive Perception 12",
+    "languages": "Giant",
+    "challenge_rating": "5",
+    "role": "Regenerator",
+    "description": "A lanky, rubbery-skinned giant with a voracious appetite and a terrifying ability to regenerate from wounds.",
+    "actions": [
+      {
+        "name": "Multiattack",
+        "desc": "The troll makes three attacks: one with its bite and two with its claws."
+      },
+      {
+        "name": "Bite",
+        "desc": "Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 7 (1d6 + 4) piercing damage.",
+        "attack_bonus": 7,
+        "damage_dice": "1d6",
+        "damage_bonus": 4
+      },
+      {
+        "name": "Claw",
+        "desc": "Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 11 (2d6 + 4) slashing damage.",
+        "attack_bonus": 7,
+        "damage_dice": "2d6",
+        "damage_bonus": 4
+      }
+    ],
+    "special_abilities": [
+      {
+        "name": "Keen Smell",
+        "desc": "The troll has advantage on Wisdom (Perception) checks that rely on smell."
+      },
+      {
+        "name": "Regeneration",
+        "desc": "The troll regains 10 hit points at the start of its turn. If the troll takes acid or fire damage, this trait doesn't function at the start of its next turn. The troll dies only if it starts its turn with 0 hit points and doesn't regenerate."
+      }
+    ]
+  },
+  {
+    "name": "Young Green Dragon",
+    "size": "Large",
+    "type": "dragon",
+    "alignment": "lawful evil",
+    "armor_class": 18,
+    "armor_desc": "Natural Armor",
+    "hit_points": 136,
+    "hit_dice": "16d10 + 48",
+    "speed": {
+      "walk": 40,
+      "fly": 80,
+      "swim": 40
+    },
+    "abilities": {
+      "STR": 19,
+      "DEX": 12,
+      "CON": 17,
+      "INT": 16,
+      "WIS": 13,
+      "CHA": 15
+    },
+    "saving_throws": {
+      "DEX": 4,
+      "CON": 6,
+      "WIS": 4,
+      "CHA": 5
+    },
+    "skills": {
+      "Deception": 5,
+      "Perception": 7,
+      "Stealth": 4
+    },
+    "damage_immunities": "Poison",
+    "condition_immunities": "Poisoned",
+    "senses": "Blindsight 30 ft., Darkvision 120 ft., Passive Perception 17",
+    "languages": "Common, Draconic",
+    "challenge_rating": "8",
+    "role": "Spellcaster / Boss",
+    "description": "A cunning, manipulative, and treacherous dragon that lairs in forests. It delights in ambush, poison, and corrupting lesser creatures.",
+    "actions": [
+      {
+        "name": "Multiattack",
+        "desc": "The dragon makes three attacks: one with its bite and two with its claws."
+      },
+      {
+        "name": "Bite",
+        "desc": "Melee Weapon Attack: +7 to hit, reach 10 ft., one target. Hit: 15 (2d10 + 4) piercing damage plus 7 (2d6) poison damage.",
+        "attack_bonus": 7,
+        "damage_dice": "2d10 + 2d6",
+        "damage_bonus": 4
+      },
+      {
+        "name": "Claw",
+        "desc": "Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 11 (2d6 + 4) slashing damage.",
+        "attack_bonus": 7,
+        "damage_dice": "2d6",
+        "damage_bonus": 4
+      }
+    ],
+    "special_abilities": [
+      {
+        "name": "Amphibious",
+        "desc": "The dragon can breathe air and water."
+      }
+    ],
+    "legendary_actions": [
+      {
+        "name": "Detect",
+        "desc": "The dragon makes a Wisdom (Perception) check."
+      },
+      {
+        "name": "Tail Attack",
+        "desc": "The dragon makes a tail attack."
+      },
+      {
+        "name": "Wing Attack (Costs 2 Actions)",
+        "desc": "The dragon beats its wings. Each creature within 10 feet must succeed on a DC 15 Dexterity saving throw or take 13 (2d6 + 6) bludgeoning damage and be knocked prone."
+      }
+    ]
+  }
+]

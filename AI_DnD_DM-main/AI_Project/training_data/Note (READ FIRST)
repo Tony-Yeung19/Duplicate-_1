@@ -1,0 +1,8 @@
+This is the training data created so far. It includes both filtered data from the dataset and synthetic data.
+
+There are 10 batches, each with 100 files of data. For a total of 1000 data files (out of ~14,700)
+'dm_training_data.jsonl' contains those 10 batchs put together.
+(I still kept the 10 batches in here since it is how the data is processed from the python code)
+'dm_training_data_cleaned.jsonl' has the data in 'dm_training_data.jsonl', but having removed duplicates and low_quality entries.
+'train_dataset.jsonl' is the compiled training dataset with both filtered (cleaned) data and synthetic data.
+Finally, 'val_dataset.jsonl' contains the dataset for validation. // idk yet how to use this, sorry :(

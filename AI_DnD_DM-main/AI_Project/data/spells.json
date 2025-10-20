@@ -1,0 +1,212 @@
+[
+  {
+    "name": "Fire Bolt",
+    "level": 0,
+    "school": "Evocation",
+    "casting_time": "1 action",
+    "range": "120 feet",
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": false
+    },
+    "duration": "Instantaneous",
+    "description": "You hurl a mote of fire at a creature or object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 fire damage. A flammable object hit by this spell ignites if it isn't being worn or carried.",
+    "damage": {
+      "dice": "1d10",
+      "type": "Fire",
+      "scaling": {
+        "levels": [5, 11, 17],
+        "dice": ["2d10", "3d10", "4d10"]
+      }
+    },
+    "attack_type": "ranged spell",
+    "classes": ["Sorcerer", "Wizard"]
+  },
+  {
+    "name": "Guidance",
+    "level": 0,
+    "school": "Divination",
+    "casting_time": "1 action",
+    "range": "Touch",
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": false
+    },
+    "duration": "Concentration, up to 1 minute",
+    "description": "You touch one willing creature. Once before the spell ends, the target can roll a d4 and add the number rolled to one ability check of its choice. It can roll the die before or after making the ability check. The spell then ends.",
+    "requires_concentration": true,
+    "classes": ["Cleric", "Druid"]
+  },
+  {
+    "name": "Cure Wounds",
+    "level": 1,
+    "school": "Evocation",
+    "casting_time": "1 action",
+    "range": "Touch",
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": false
+    },
+    "duration": "Instantaneous",
+    "description": "A creature you touch regains a number of hit points equal to 1d8 + your spellcasting ability modifier. This spell has no effect on undead or constructs.",
+    "healing": {
+      "dice": "1d8",
+      "add_modifier": true
+    },
+    "higher_levels": "When you cast this spell using a spell slot of 2nd level or higher, the healing increases by 1d8 for each slot level above 1st.",
+    "classes": ["Bard", "Cleric", "Druid", "Paladin", "Ranger"]
+  },
+  {
+    "name": "Magic Missile",
+    "level": 1,
+    "school": "Evocation",
+    "casting_time": "1 action",
+    "range": "120 feet",
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": false
+    },
+    "duration": "Instantaneous",
+    "description": "You create three glowing darts of magical force. Each dart hits a creature of your choice that you can see within range. A dart deals 1d4 + 1 force damage to its target. The darts all strike simultaneously.",
+    "damage": {
+      "dice": "1d4 + 1",
+      "type": "Force",
+      "number_of_darts": 3
+    },
+    "auto_hit": true,
+    "higher_levels": "When you cast this spell using a spell slot of 2nd level or higher, the spell creates one more dart for each slot level above 1st.",
+    "classes": ["Sorcerer", "Wizard"]
+  },
+  {
+    "name": "Shield",
+    "level": 1,
+    "school": "Abjuration",
+    "casting_time": "1 reaction",
+    "range": "Self",
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": false
+    },
+    "duration": "1 round",
+    "description": "An invisible barrier of magical force appears and protects you. Until the start of your next turn, you have a +5 bonus to AC, including against the triggering attack, and you take no damage from the Magic Missile spell.",
+    "reaction_trigger": "When you are hit by an attack or targeted by the Magic Missile spell",
+    "classes": ["Sorcerer", "Wizard"]
+  },
+  {
+    "name": "Sleep",
+    "level": 1,
+    "school": "Enchantment",
+    "casting_time": "1 action",
+    "range": "90 feet",
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": "A pinch of fine sand, rose petals, or a cricket"
+    },
+    "duration": "1 minute",
+    "description": "This spell sends creatures into a magical slumber. Roll 5d8; the total is how many hit points of creatures this spell can affect. Creatures within 20 feet of a point you choose within range are affected in ascending order of their current hit points.",
+    "hit_points_affected": "5d8",
+    "higher_levels": "When you cast this spell using a spell slot of 2nd level or higher, roll an additional 2d8 for each slot level above 1st.",
+    "condition": "Unconscious",
+    "classes": ["Bard", "Sorcerer", "Wizard"]
+  },
+  {
+    "name": "Fireball",
+    "level": 3,
+    "school": "Evocation",
+    "casting_time": "1 action",
+    "range": "150 feet",
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": "A tiny ball of bat guano and sulfur"
+    },
+    "duration": "Instantaneous",
+    "description": "A bright streak flashes from your pointing finger to a point you choose within range and then blossoms with a low roar into an explosion of flame. Each creature in a 20-foot-radius sphere centered on that point must make a Dexterity saving throw.",
+    "damage": {
+      "dice": "8d6",
+      "type": "Fire"
+    },
+    "save": {
+      "ability": "DEX",
+      "on_success": "half"
+    },
+    "area_of_effect": {
+      "type": "sphere",
+      "size": 20
+    },
+    "higher_levels": "When you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd.",
+    "classes": ["Sorcerer", "Wizard"]
+  },
+  {
+    "name": "Counterspell",
+    "level": 3,
+    "school": "Abjuration",
+    "casting_time": "1 reaction",
+    "range": "60 feet",
+    "components": {
+      "somatic": true
+    },
+    "duration": "Instantaneous",
+    "description": "You attempt to interrupt a creature in the process of casting a spell. If the creature is casting a spell of 3rd level or lower, its spell fails and has no effect. If it is casting a spell of 4th level or higher, make an ability check using your spellcasting ability. The DC equals 10 + the spell's level. On a success, the creature's spell fails and has no effect.",
+    "reaction_trigger": "When you see a creature within 60 feet of you casting a spell",
+    "classes": ["Sorcerer", "Warlock", "Wizard"]
+  },
+  {
+    "name": "Polymorph",
+    "level": 4,
+    "school": "Transmutation",
+    "casting_time": "1 action",
+    "range": "60 feet",
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": "A caterpillar cocoon"
+    },
+    "duration": "Concentration, up to 1 hour",
+    "description": "This spell transforms a creature that you can see within range into a new form. An unwilling creature must make a Wisdom saving throw to avoid the effect. The transformation lasts for the duration, or until the target drops to 0 hit points or dies.",
+    "save": {
+      "ability": "WIS",
+      "on_success": "negates"
+    },
+    "requires_concentration": true,
+    "classes": ["Bard", "Druid", "Sorcerer", "Wizard"]
+  },
+  {
+    "name": "Raise Dead",
+    "level": 5,
+    "school": "Necromancy",
+    "casting_time": "1 hour",
+    "range": "Touch",
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": "A diamond worth at least 500 gp, which the spell consumes"
+    },
+    "duration": "Instantaneous",
+    "description": "You return a dead creature you touch to life, provided that it has been dead no longer than 10 days. If the creature's soul is both willing and at liberty to rejoin the body, the creature returns to life with 1 hit point. This spell also neutralizes any poisons and cures nonmagical diseases that affected the creature at the time it died.",
+    "material_cost": "500 gp diamond (consumed)",
+    "limitations": "Doesn't restore missing body parts, doesn't work on death by old age",
+    "classes": ["Bard", "Cleric", "Paladin"]
+  },
+  {
+    "name": "Wish",
+    "level": 9,
+    "school": "Conjuration",
+    "casting_time": "1 action",
+    "range": "Self",
+    "components": {
+      "verbal": true
+    },
+    "duration": "Instantaneous",
+    "description": "Wish is the mightiest spell a mortal creature can cast. By simply speaking aloud, you can alter the very foundations of reality in accord with your desires. The basic use of this spell is to duplicate any other spell of 8th level or lower without meeting its requirements.",
+    "stress_effect": "Casting this spell for any effect other than duplicating another spell causes immense stress. Afterward, your Strength drops to 3 for 2d4 days, and each time you cast a spell until then, you take 1d10 necrotic damage per level of that spell.",
+    "limitations": "The GM has great latitude in ruling what occurs when a Wish is used for anything beyond duplicating another spell; the wish might pervert the caster's intent.",
+    "classes": ["Sorcerer", "Wizard"]
+  }
+]

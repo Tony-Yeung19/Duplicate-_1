@@ -1,0 +1,183 @@
+{
+  "core_mechanics": {
+    "description": "These are the fundamental rules that govern most actions in the game.",
+    "d20_test": {
+      "description": "When you try to do something risky or opposed, you make a d20 Test.",
+      "steps": [
+        "Roll a 20-sided die (d20).",
+        "Add any relevant modifiers (usually an Ability Modifier and sometimes a Proficiency Bonus).",
+        "Compare the total to a target number (Difficulty Class for checks, Armor Class for attacks).",
+        "If your total equals or beats the target number, you succeed!"
+      ]
+    },
+    "advantage_disadvantage": {
+      "description": "Sometimes circumstances make a task easier or harder.",
+      "advantage": "Roll two d20s and use the higher number.",
+      "disadvantage": "Roll two d20s and use the lower number.",
+      "cancellation": "If you have both Advantage and Disadvantage, they cancel out and you roll normally."
+    }
+  },
+  "abilities": {
+    "description": "Every creature has six Abilities that represent their physical and mental characteristics.",
+    "Strength": "Measures physical power. Used for athletics, jumping, and swinging heavy weapons.",
+    "Dexterity": "Measures agility, reflexes, and balance. Used for stealth, acrobatics, and firing ranged weapons.",
+    "Constitution": "Measures health and stamina. Used to resist poison and survive harsh conditions.",
+    "Intelligence": "Measures reasoning and memory. Used for arcana, history, and investigation.",
+    "Wisdom": "Measures perception and insight. Used for noticing details, healing, and reading people.",
+    "Charisma": "Measures confidence and force of personality. Used for persuasion, deception, and intimidation."
+  },
+  "ability_modifiers": {
+    "description": "Your Ability Score gives you a modifier, which is the number you add to rolls.",
+    "table": [
+      { "score": 1, "modifier": -5 },
+      { "score": [2, 3], "modifier": -4 },
+      { "score": [4, 5], "modifier": -3 },
+      { "score": [6, 7], "modifier": -2 },
+      { "score": [8, 9], "modifier": -1 },
+      { "score": [10, 11], "modifier": 0 },
+      { "score": [12, 13], "modifier": 1 },
+      { "score": [14, 15], "modifier": 2 },
+      { "score": [16, 17], "modifier": 3 },
+      { "score": [18, 19], "modifier": 4 },
+      { "score": [20, 21], "modifier": 5 }
+    ]
+  },
+  "proficiency": {
+    "description": "If you are proficient with something, you add your Proficiency Bonus to the roll.",
+    "level_1_bonus": 2,
+    "applies_to": [
+      "Attack rolls with weapons you're proficient with.",
+      "Ability checks using skills or tools you're proficient with.",
+      "Saving throws you're proficient with.",
+      "The difficulty of saving throws against your spells."
+    ]
+  },
+  "skills": {
+    "description": "Skills are specific applications of your Abilities. You add your Proficiency Bonus if you are trained in that skill.",
+    "Strength": ["Athletics"],
+    "Dexterity": ["Acrobatics", "Sleight of Hand", "Stealth"],
+    "Intelligence": ["Arcana", "History", "Investigation", "Nature", "Religion"],
+    "Wisdom": ["Animal Handling", "Insight", "Medicine", "Perception", "Survival"],
+    "Charisma": ["Deception", "Intimidation", "Performance", "Persuasion"]
+  },
+  "difficulty_class": {
+    "description": "The Difficulty Class (DC) is the target number for an Ability Check or Saving Throw.",
+    "example_dcs": {
+      "Very Easy (5)": "Lifting a small rock, remembering a common rumor.",
+      "Easy (10)": "Climbing a rough rope, calming a normal horse.",
+      "Medium (15)": "Picking an average lock, tracking a creature through the woods.",
+      "Hard (20)": "Picking a complex lock, swinging from a chandelier.",
+      "Very Hard (25)": "Convincing a king to abdicate, climbing a sheer icy cliff."
+    }
+  },
+  "combat": {
+    "description": "Combat is structured into rounds where each participant gets a turn.",
+    "initiative": "At the start of combat, everyone rolls a Dexterity check to determine turn order. Higher rolls go first.",
+    "turn_structure": "On your turn in combat, you can do three things:",
+    "actions": [
+      {
+        "name": "Move",
+        "description": "You can move up to your Speed (usually 30 feet for most characters)."
+      },
+      {
+        "name": "Action",
+        "description": "You can take one main action, like Attack, Cast a Spell, Dash, Disengage, Dodge, Help, Hide, or Search."
+      },
+      {
+        "name": "Bonus Action",
+        "description": "You can take one special action if a class feature, spell, or feat grants it. You only get one per turn."
+      }
+    ],
+    "reaction": "You can also take one Reaction per round, which is an instant response to a trigger, like an enemy moving away from you (Opportunity Attack).",
+    "making_an_attack": {
+      "steps": [
+        "Choose a target within your weapon's or spell's range.",
+        "Roll a d20 and add your Attack Bonus (Ability Modifier + Proficiency Bonus if proficient).",
+        "If the total equals or exceeds the target's Armor Class (AC), you hit!",
+        "Roll the damage dice for your weapon or spell and add your relevant Ability Modifier (for weapons)."
+      ]
+    },
+    "armor_class": {
+      "description": "Armor Class (AC) represents how hard a creature is to hit. An unarmored person has an AC of 10 + their Dexterity Modifier. Armor and shields increase this number."
+    },
+    "critical_hit": "If you roll a natural 20 on an attack roll, it's a Critical Hit! You get to roll all of the attack's damage dice twice."
+  },
+  "spellcasting": {
+    "description": "Spellcasters can produce magical effects by casting spells.",
+    "cantrips": "Simple spells that can be cast an unlimited number of times.",
+    "spell_slots": "Powerful spells require the use of a limited resource called spell slots. You regain expended spell slots after a Long Rest.",
+    "casting_a_spell": {
+      "steps": [
+        "Choose a spell you have prepared and that you have a spell slot for.",
+        "Spells often require one or more components:",
+        "Verbal (V): You must speak magical words.",
+        "Somatic (S): You must make specific hand gestures.",
+        "Material (M): You must have a specific item, often held in a spellcasting focus.",
+        "Follow the spell's description to see what happens!"
+      ]
+    },
+    "concentration": {
+      "description": "Some spells require you to maintain concentration to keep them active.",
+      "breaks_concentration": "Taking damage, being incapacitated, or casting another concentration spell.",
+      "check": "If you take damage, you must make a Constitution saving throw (DC = 10 or half the damage taken, whichever is higher) to maintain concentration."
+    }
+  },
+  "resting": {
+    "description": "Adventurers need to rest to recover their strength and abilities.",
+    "short_rest": {
+      "duration": "At least 1 hour of light activity.",
+      "benefits": "Spend Hit Dice to recover hit points. Some class features recharge."
+    },
+    "long_rest": {
+      "duration": "At least 8 hours of sleep and light activity.",
+      "benefits": "Regain all lost hit points. Regain all spent Hit Dice (up to half your total). Regain all spent spell slots and class features."
+    }
+  },
+  "conditions": {
+    "description": "Conditions alter a creature's capabilities in a variety of ways.",
+    "common_conditions": [
+      {
+        "name": "Blinded",
+        "effect": "Can't see. Automatically fails checks that require sight. Attack rolls against it have Advantage. Its attacks have Disadvantage."
+      },
+      {
+        "name": "Frightened",
+        "effect": "Can't move closer to the source of its fear. Has Disadvantage on ability checks and attack rolls while it can see the source."
+      },
+      {
+        "name": "Incapacitated",
+        "effect": "Can't take actions or reactions."
+      },
+      {
+        "name": "Invisible",
+        "effect": "Can't be seen. Is Heavily Obscured. Attack rolls against it have Disadvantage. Its attacks have Advantage."
+      },
+      {
+        "name": "Poisoned",
+        "effect": "Has Disadvantage on attack rolls and ability checks."
+      },
+      {
+        "name": "Prone",
+        "effect": "Crawling costs extra movement. Has Disadvantage on attack rolls. Attack rolls against it have Advantage if attacker is within 5 ft., Disadvantage otherwise."
+      },
+      {
+        "name": "Unconscious",
+        "effect": "Incapacitated, falls Prone, drops held items. Attacks against it from within 5 ft. are Automatic Critical Hits."
+      }
+    ]
+  },
+  "damage_types": [
+    "Acid", "Bludgeoning", "Cold", "Fire", "Force", "Lightning", "Necrotic", "Piercing", "Poison", "Psychic", "Radiant", "Slashing", "Thunder"
+  ],
+  "healing_and_death": {
+    "hit_points": "Represent your health. At 0 HP, you fall Unconscious.",
+    "death_saving_throws": {
+      "description": "When you start your turn with 0 HP, you must make a Death Saving Throw.",
+      "success": "Roll a 10 or higher on a d20. 3 successes stabilize you.",
+      "failure": "Roll a 9 or lower. 3 failures mean you die.",
+      "critical": "Rolling a natural 20 instantly lets you regain 1 HP.",
+      "critical_failure": "Rolling a natural 1 counts as two failures."
+    },
+    "stabilizing": "A creature can use a Healer's Kit or make a DC 10 Wisdom (Medicine) check to stabilize a dying creature. Stable creatures don't make death saves but remain unconscious."
+  }
+}

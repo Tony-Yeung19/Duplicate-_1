@@ -1,0 +1,375 @@
+[
+  {
+    "class": "Barbarian",
+    "hit_die": "d12",
+    "primary_ability": ["Strength"],
+    "saves": ["Strength", "Constitution"],
+    "armor_proficiencies": ["Light", "Medium", "Shield"],
+    "weapon_proficiencies": ["Simple", "Martial"],
+    "skill_choices": 2,
+    "skill_options": ["Animal Handling", "Athletics", "Intimidation", "Nature", "Perception", "Survival"],
+    "features": [
+      {
+        "level": 1,
+        "name": "Rage",
+        "type": "Class Feature",
+        "description": "Enter a rage as a Bonus Action. Gain advantage on Strength checks and saves, +2 damage with melee weapons, and resistance to bludgeoning, piercing, and slashing damage.",
+        "uses": 2,
+        "recharge": "long rest",
+        "action_type": "bonus"
+      },
+      {
+        "level": 1,
+        "name": "Unarmored Defense",
+        "type": "Passive Feature",
+        "description": "While not wearing armor, AC = 10 + DEX modifier + CON modifier.",
+        "passive": true
+      }
+    ]
+  },
+
+  {
+    "class": "Bard",
+    "hit_die": "d8",
+    "primary_ability": ["Charisma"],
+    "saves": ["Dexterity", "Charisma"],
+    "armor_proficiencies": ["Light"],
+    "weapon_proficiencies": ["Simple"],
+    "tool_proficiencies": ["Three musical instruments of your choice"],
+    "skill_choices": 3,
+    "skill_options": ["Any"],
+    "features": [
+      {
+        "level": 1,
+        "name": "Bardic Inspiration",
+        "type": "Class Feature",
+        "description": "As a bonus action, grant a Bardic Inspiration die (d6) to an ally. They can add it to one ability check, attack roll, or saving throw.",
+        "uses": 3,
+        "recharge": "long rest",
+        "action_type": "bonus",
+        "die_size": "d6"
+      },
+      {
+        "level": 1,
+        "name": "Spellcasting",
+        "type": "Spellcasting",
+        "description": "You are a full spellcaster using the Bard spell list. Your spellcasting ability is Charisma.",
+        "spellcasting_ability": "charisma",
+        "spell_slots": [2],
+        "cantrips_known": 2
+      }
+    ]
+  },
+
+  {
+    "class": "Cleric",
+    "hit_die": "d8",
+    "primary_ability": ["Wisdom"],
+    "saves": ["Wisdom", "Charisma"],
+    "armor_proficiencies": ["Light", "Medium", "Shield"],
+    "weapon_proficiencies": ["Simple"],
+    "skill_choices": 2,
+    "skill_options": ["History", "Insight", "Medicine", "Persuasion", "Religion"],
+    "features": [
+      {
+        "level": 1,
+        "name": "Spellcasting",
+        "type": "Spellcasting",
+        "description": "You are a full spellcaster using the Cleric spell list. Your spellcasting ability is Wisdom.",
+        "spellcasting_ability": "wisdom",
+        "spell_slots": [2],
+        "cantrips_known": 3
+      },
+      {
+        "level": 1,
+        "name": "Divine Order",
+        "type": "Class Feature",
+        "description": "Choose Protector (gain Martial weapons & Heavy armor) or Thaumaturge (gain an extra cantrip and a bonus to Arcana/Religion checks).",
+        "passive": true
+      }
+    ]
+  },
+
+  {
+    "class": "Druid",
+    "hit_die": "d8",
+    "primary_ability": ["Wisdom"],
+    "saves": ["Intelligence", "Wisdom"],
+    "armor_proficiencies": ["Light", "Shield"],
+    "weapon_proficiencies": ["Simple"],
+    "tool_proficiencies": ["Herbalism Kit"],
+    "skill_choices": 2,
+    "skill_options": ["Animal Handling", "Arcana", "Insight", "Medicine", "Nature", "Perception", "Religion", "Survival"],
+    "features": [
+      {
+        "level": 1,
+        "name": "Spellcasting",
+        "type": "Spellcasting",
+        "description": "You are a full spellcaster using the Druid spell list. Your spellcasting ability is Wisdom.",
+        "spellcasting_ability": "wisdom",
+        "spell_slots": [2],
+        "cantrips_known": 2
+      },
+      {
+        "level": 1,
+        "name": "Primal Order",
+        "type": "Class Feature",
+        "description": "Choose Magician (gain an extra cantrip and a bonus to Arcana/Nature checks) or Warden (gain Martial weapons and Medium armor).",
+        "passive": true
+      }
+    ]
+  },
+
+  {
+    "class": "Fighter",
+    "hit_die": "d10",
+    "primary_ability": ["Strength", "Dexterity"],
+    "saves": ["Strength", "Constitution"],
+    "armor_proficiencies": ["Light", "Medium", "Heavy", "Shield"],
+    "weapon_proficiencies": ["Simple", "Martial"],
+    "skill_choices": 2,
+    "skill_options": ["Acrobatics", "Animal Handling", "Athletics", "History", "Insight", "Intimidation", "Perception", "Survival"],
+    "features": [
+      {
+        "level": 1,
+        "name": "Fighting Style",
+        "type": "Passive Feature",
+        "description": "Choose a Fighting Style feat (e.g., Archery, Defense, Dueling).",
+        "passive": true
+      },
+      {
+        "level": 1,
+        "name": "Second Wind",
+        "type": "Class Feature",
+        "description": "On your turn, use a bonus action to regain 1d10 + Fighter level hit points.",
+        "uses": 1,
+        "recharge": "short or long rest",
+        "action_type": "bonus",
+        "healing_dice": "1d10 + 1"
+      }
+    ]
+  },
+
+  {
+    "class": "Monk",
+    "hit_die": "d8",
+    "primary_ability": ["Dexterity", "Wisdom"],
+    "saves": ["Strength", "Dexterity"],
+    "armor_proficiencies": [],
+    "weapon_proficiencies": ["Simple", "Shortswords"],
+    "tool_proficiencies": ["One type of Artisan's Tools or one Musical Instrument"],
+    "skill_choices": 2,
+    "skill_options": ["Acrobatics", "Athletics", "History", "Insight", "Religion", "Stealth"],
+    "features": [
+      {
+        "level": 1,
+        "name": "Martial Arts",
+        "type": "Class Feature",
+        "description": "When you use the Attack action with an unarmed strike or monk weapon, you can make one unarmed strike as a bonus action.",
+        "damage_dice": "1d4",
+        "damage_type": "Bludgeoning",
+        "action_type": "bonus"
+      },
+      {
+        "level": 1,
+        "name": "Unarmored Defense",
+        "type": "Passive Feature",
+        "description": "While not wearing armor or wielding a shield, AC = 10 + DEX modifier + WIS modifier.",
+        "passive": true
+      }
+    ]
+  },
+
+  {
+    "class": "Paladin",
+    "hit_die": "d10",
+    "primary_ability": ["Strength", "Charisma"],
+    "saves": ["Wisdom", "Charisma"],
+    "armor_proficiencies": ["Light", "Medium", "Heavy", "Shield"],
+    "weapon_proficiencies": ["Simple", "Martial"],
+    "skill_choices": 2,
+    "skill_options": ["Athletics", "Insight", "Intimidation", "Medicine", "Persuasion", "Religion"],
+    "features": [
+      {
+        "level": 1,
+        "name": "Lay on Hands",
+        "type": "Class Feature",
+        "description": "You have a pool of healing power that can restore 5 hit points. As an action, you can touch a creature to restore any number of hit points remaining in the pool.",
+        "pool": 5,
+        "recharge": "long rest",
+        "action_type": "action"
+      },
+      {
+        "level": 1,
+        "name": "Divine Sense",
+        "type": "Class Feature",
+        "description": "As an action, detect celestial, fiend, or undead within 60 feet that isn't behind total cover.",
+        "uses": 1,
+        "recharge": "long rest",
+        "action_type": "action"
+      },
+      {
+        "level": 1,
+        "name": "Spellcasting",
+        "description": "You are a half spellcaster using the Paladin spell list. Your spellcasting ability is Charisma."
+      }
+    ]
+  },
+
+  {
+    "class": "Ranger",
+    "hit_die": "d10",
+    "primary_ability": ["Dexterity", "Wisdom"],
+    "saves": ["Strength", "Dexterity"],
+    "armor_proficiencies": ["Light", "Medium", "Shield"],
+    "weapon_proficiencies": ["Simple", "Martial"],
+    "skill_choices": 3,
+    "skill_options": ["Animal Handling", "Athletics", "Insight", "Investigation", "Nature", "Perception", "Stealth", "Survival"],
+    "features": [
+      {
+        "level": 1,
+        "name": "Favored Foe",
+        "type": "Class Feature",
+        "description": "When you hit a creature with an attack roll, you can mark it as your favored enemy. The first time each turn you hit it, deal an extra 1d4 damage.",
+        "uses": 2,
+        "recharge": "long rest",
+        "damage_dice": "1d4"
+      },
+      {
+        "level": 1,
+        "name": "Spellcasting",
+        "type": "Spellcasting",
+        "description": "You are a half spellcaster using the Ranger spell list. Your spellcasting ability is Wisdom.",
+        "spellcasting_ability": "wisdom",
+        "spell_slots": [0],
+        "cantrips_known": 0
+      }
+    ]
+  },
+
+  {
+    "class": "Rogue",
+    "hit_die": "d8",
+    "primary_ability": ["Dexterity"],
+    "saves": ["Dexterity", "Intelligence"],
+    "armor_proficiencies": ["Light"],
+    "weapon_proficiencies": ["Simple", "Hand Crossbows", "Longswords", "Rapiers", "Shortswords"],
+    "tool_proficiencies": ["Thieves' Tools"],
+    "skill_choices": 4,
+    "skill_options": ["Acrobatics", "Athletics", "Deception", "Insight", "Intimidation", "Investigation", "Perception", "Performance", "Persuasion", "Sleight of Hand", "Stealth"],
+    "features": [
+      {
+        "level": 1,
+        "name": "Expertise",
+        "type": "Passive Feature",
+        "description": "Choose two of your skill proficiencies. Your proficiency bonus is doubled for any ability check you make with them.",
+        "passive": true
+      },
+      {
+        "level": 1,
+        "name": "Sneak Attack",
+        "type": "Class Feature",
+        "description": "Once per turn, deal an extra 1d6 damage to one creature you hit with an attack with a finesse or ranged weapon if you have advantage or an ally is within 5 feet.",
+        "damage_dice": "1d6",
+        "conditions": "Advantage or ally adjacent to target"
+      },
+      {
+        "level": 1,
+        "name": "Cunning Action",
+        "type": "Class Feature",
+        "description": "You can take a bonus action on each of your turns to take the Dash, Disengage, or Hide action.",
+        "action_type": "bonus",
+        "uses": "At will"
+      }
+    ]
+  },
+
+  {
+    "class": "Sorcerer",
+    "hit_die": "d6",
+    "primary_ability": ["Charisma"],
+    "saves": ["Constitution", "Charisma"],
+    "armor_proficiencies": [],
+    "weapon_proficiencies": ["Daggers", "Darts", "Slings", "Quarterstaffs", "Light Crossbows"],
+    "skill_choices": 2,
+    "skill_options": ["Arcana", "Deception", "Insight", "Intimidation", "Persuasion", "Religion"],
+    "features": [
+      {
+        "level": 1,
+        "name": "Spellcasting",
+        "type": "Spellcasting",
+        "description": "You are a full spellcaster using the Sorcerer spell list. Your spellcasting ability is Charisma.",
+        "spellcasting_ability": "charisma",
+        "spell_slots": [2],
+        "cantrips_known": 4
+      },
+      {
+        "level": 1,
+        "name": "Sorcerous Origin",
+        "type": "Class Feature",
+        "description": "Choose a subclass that defines the source of your innate magic (e.g., Draconic Sorcery).",
+        "passive": true
+      }
+    ]
+  },
+
+  {
+    "class": "Warlock",
+    "hit_die": "d8",
+    "primary_ability": ["Charisma"],
+    "saves": ["Wisdom", "Charisma"],
+    "armor_proficiencies": ["Light"],
+    "weapon_proficiencies": ["Simple"],
+    "skill_choices": 2,
+    "skill_options": ["Arcana", "Deception", "History", "Intimidation", "Investigation", "Nature", "Religion"],
+    "features": [
+      {
+        "level": 1,
+        "name": "Pact Magic",
+        "type": "Spellcasting",
+        "description": "You are a unique spellcaster with a small number of powerful spell slots that recharge on a short rest. Your spellcasting ability is Charisma.",
+        "spellcasting_ability": "charisma",
+        "spell_slots": [1],
+        "cantrips_known": 2,
+        "recharge": "short rest"
+      },
+      {
+        "level": 1,
+        "name": "Otherworldly Patron",
+        "type": "Class Feature",
+        "description": "Choose a being that grants you your powers (e.g., The Fiend).",
+        "passive": true
+      }
+    ]
+  },
+  
+  {
+    "class": "Wizard",
+    "hit_die": "d6",
+    "primary_ability": ["Intelligence"],
+    "saves": ["Intelligence", "Wisdom"],
+    "armor_proficiencies": [],
+    "weapon_proficiencies": ["Daggers", "Darts", "Slings", "Quarterstaffs", "Light Crossbows"],
+    "skill_choices": 2,
+    "skill_options": ["Arcana", "History", "Insight", "Investigation", "Medicine", "Religion"],
+    "features": [
+      {
+        "level": 1,
+        "name": "Spellcasting",
+        "type": "Spellcasting",
+        "description": "You are a full spellcaster using the Wizard spell list. You learn spells from a spellbook. Your spellcasting ability is Intelligence.",
+        "spellcasting_ability": "intelligence",
+        "spell_slots": [2],
+        "cantrips_known": 3
+      },
+      {
+        "level": 1,
+        "name": "Arcane Recovery",
+        "type": "Class Feature",
+        "description": "Once per day during a short rest, you can recover expended spell slots with a total level equal to or less than half your wizard level (rounded up).",
+        "recovery_level": 1,
+        "recharge": "long rest"
+      }
+    ]
+  }
+]

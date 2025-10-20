@@ -1,0 +1,123 @@
+{
+  "dice_mechanics": {
+    "purpose": "This document defines the standard format and rules for dice notation and resolution in the D&D 5e game system. It is designed to ensure consistent interpretation and execution of dice rolls by the AI.",
+    "core_dice": {
+      "d4": "Four-sided die. Used for small weapon damage and minor healing.",
+      "d6": "Six-sided die. Common for weapon damage, spell effects, and ability checks.",
+      "d8": "Eight-sided die. Used for versatile weapons and larger spell effects.",
+      "d10": "Ten-sided die. Used for some weapons and percentile rolls.",
+      "d12": "Twelve-sided die. Used for large weapons like greataxes.",
+      "d20": "Twenty-sided die. The most important die, used for attack rolls, saving throws, and ability checks.",
+      "d100": "One hundred-sided die (typically simulated with 2d10). Used for percentile rolls."
+    },
+    "notation_guide": {
+      "basic_format": "The standard format is [Number of Dice]d[Sides][ + Modifier]",
+      "examples": [
+        {
+          "notation": "1d20",
+          "meaning": "Roll one twenty-sided die. Result: 1-20.",
+          "common_use": "Base roll for attacks, saves, and checks."
+        },
+        {
+          "notation": "1d20 + 5",
+          "meaning": "Roll one d20 and add 5 to the result.",
+          "common_use": "Attack roll with +5 bonus."
+        },
+        {
+          "notation": "2d6 + 3",
+          "meaning": "Roll two six-sided dice, sum them, then add 3.",
+          "common_use": "Greatsword damage with Strength modifier."
+        },
+        {
+          "notation": "4d8",
+          "meaning": "Roll four eight-sided dice and sum them.",
+          "common_use": "Fireball spell damage at character level 5."
+        },
+        {
+          "notation": "1d4 + 1d6 + 2",
+          "meaning": "Roll one d4, one d6, sum them, then add 2.",
+          "common_use": "Complex damage roll with multiple effects."
+        }
+      ],
+      "special_notations": [
+        {
+          "term": "Advantage",
+          "notation": "2d20kh1",
+          "meaning": "Roll two d20s and keep the higher result.",
+          "alternative_formats": ["/roll with advantage/", "advantage on the roll"]
+        },
+        {
+          "term": "Disadvantage",
+          "notation": "2d20kl1",
+          "meaning": "Roll two d20s and keep the lower result.",
+          "alternative_formats": ["/roll with disadvantage/", "disadvantage on the roll"]
+        },
+        {
+          "term": "Percentile",
+          "notation": "1d100",
+          "meaning": "Roll two d10s where one represents the tens place and one the ones place (or use a d100).",
+          "alternative_formats": ["d%", "percentile roll"]
+        }
+      ]
+    },
+    "common_roll_types": {
+      "ability_check": {
+        "description": "Determines success at a task using one of the six abilities.",
+        "formula": "1d20 + [Ability Modifier] + [Proficiency Bonus if proficient]",
+        "example": "Strength (Athletics) check with +3 Strength modifier and +2 proficiency: 1d20 + 5"
+      },
+      "attack_roll": {
+        "description": "Determines if an attack hits a target.",
+        "formula": "1d20 + [Ability Modifier] + [Proficiency Bonus] + [Other Bonuses]",
+        "example": "Longsword attack with +3 Strength and +2 proficiency: 1d20 + 5"
+      },
+      "saving_throw": {
+        "description": "Attempt to resist a harmful effect.",
+        "formula": "1d20 + [Ability Modifier] + [Proficiency Bonus if proficient]",
+        "example": "Dexterity saving throw with +2 Dexterity modifier: 1d20 + 2"
+      },
+      "damage_roll": {
+        "description": "Determines how much damage is dealt by a successful attack or effect.",
+        "formula": "[Weapon/Spell Dice] + [Ability Modifier] + [Other Bonuses]",
+        "example": "Longsword damage with +3 Strength: 1d8 + 3"
+      },
+      "healing_roll": {
+        "description": "Determines how many hit points are restored.",
+        "formula": "[Spell/Feature Dice] + [Bonus]",
+        "example": "Cure Wounds cast at 1st level with +3 Wisdom: 1d8 + 3"
+      }
+    },
+    "critical_rules": {
+      "critical_hit": {
+        "trigger": "When an attack roll is a natural 20 (the d20 shows 20)",
+        "effect": "The attack automatically hits regardless of AC. Roll all of the attack's damage dice twice and add them together. Then add any relevant modifiers as normal.",
+        "example": "Critical hit with a dagger (1d4) and +3 Dexterity: (1d4 + 1d4) + 3 = 2d4 + 3"
+      },
+      "critical_failure": {
+        "trigger": "When an attack roll is a natural 1 (the d20 shows 1)",
+        "effect": "The attack automatically misses regardless of modifiers or target's AC.",
+        "note": "Critical failures only affect attack rolls, not ability checks or saving throws."
+      }
+    },
+    "resolution_rules": {
+      "rounding": "Always round down unless otherwise specified. For example, half of 7 is 3.",
+      "success_criteria": "For d20 rolls, success is achieved when the total meets or exceeds the target number (DC for checks/saves, AC for attacks).",
+      "resistance": "If a creature has resistance to a damage type, damage of that type is halved (after applying modifiers).",
+      "vulnerability": "If a creature has vulnerability to a damage type, damage of that type is doubled.",
+      "immunity": "If a creature has immunity to a damage type, it takes no damage from that type."
+    },
+    "sample_rolls_for_ai": {
+      "simple_attack": "Roll attack: 1d20 + 5, then damage: 1d8 + 3",
+      "spell_with_save": "Target makes DEX save DC 13. On fail: 4d6 fire damage. On success: half damage.",
+      "skill_check": "Make a Wisdom (Perception) check: 1d20 + 4",
+      "healing": "Roll healing: 2d4 + 2",
+      "advantage_roll": "Roll with advantage: 2d20kh1 + 3"
+    },
+    "best_practices": {
+      "clarity": "Always specify what a roll is for (e.g., 'Roll perception check' rather than just 'roll d20+4')",
+      "completeness": "When describing combat results, include: attack roll total, whether it hit, damage roll total, and any special effects",
+      "narration": "After calculating mechanical results, provide a narrative description of the outcome",
+      "error_handling": "If dice notation is unclear, ask for clarification rather than guessing"
+    }
+  }
+}

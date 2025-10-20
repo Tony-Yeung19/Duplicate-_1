@@ -1,0 +1,148 @@
+[
+  {
+    "name": "Attack",
+    "type": "Action",
+    "description": "The most common action in combat, used to make a melee or ranged attack with a weapon, a spell, or an unarmed strike.",
+    "mechanics": {
+      "process": [
+        "Choose a target within your weapon's or spell's range.",
+        "Make an attack roll: 1d20 + Ability Modifier + Proficiency Bonus (if proficient).",
+        "Compare the total to the target's Armor Class (AC).",
+        "If the total equals or exceeds the AC, the attack hits.",
+        "On a hit, roll damage dice and add the relevant ability modifier."
+      ],
+      "special": "Some features, like the Fighter's Extra Attack, allow you to make more than one attack with this action."
+    }
+  },
+  {
+    "name": "Cast a Spell",
+    "type": "Action",
+    "description": "Used to cast a spell with a casting time of 1 action. Spells have a wide variety of effects, from dealing damage to healing to altering the environment.",
+    "mechanics": {
+      "requirements": "You must have the spell prepared (if your class prepares spells) and have an available spell slot of the appropriate level (if the spell is not a cantrip).",
+      "components": {
+        "verbal": "Requires chanting magical words.",
+        "somatic": "Requires specific hand gestures.",
+        "material": "Requires specific components, which are consumed if the spell description says they are."
+      },
+      "concentration": "Some spells require concentration, which means you must maintain focus to keep the spell active. You can only concentrate on one spell at a time. Taking damage can break concentration."
+    }
+  },
+  {
+    "name": "Dash",
+    "type": "Action",
+    "description": "You gain extra movement for the current turn. The increase equals your speed, after applying any modifiers.",
+    "mechanics": "For example, a character with a speed of 30 feet who takes the Dash action can move up to 60 feet on their turn."
+  },
+  {
+    "name": "Disengage",
+    "type": "Action",
+    "description": "Your movement doesn't provoke opportunity attacks for the rest of the turn.",
+    "mechanics": "This is essential for moving away from hostile creatures without being struck as you leave their reach."
+  },
+  {
+    "name": "Dodge",
+    "type": "Action",
+    "description": "You focus entirely on avoiding attacks. Until the start of your next turn, any attack roll made against you has disadvantage if you can see the attacker, and you make Dexterity saving throws with advantage.",
+    "mechanics": "You lose this benefit if you are incapacitated or if your speed drops to 0."
+  },
+  {
+    "name": "Help",
+    "type": "Action",
+    "description": "You lend your aid to another creature in the completion of a task.",
+    "mechanics": {
+      "out_of_combat": "The target gains advantage on the next ability check it makes to perform the task.",
+      "in_combat": "You can help an ally attack a creature within 5 feet of you. You feint, distract the target, or in some other way team up to make your ally's attack more effective. If your ally attacks the target before your next turn, the first attack roll is made with advantage."
+    },
+    "prerequisite": "You must be able to provide meaningful help; the GM has final say on what constitutes help."
+  },
+  {
+    "name": "Hide",
+    "type": "Action",
+    "description": "You attempt to hide, following the rules for hiding in the 'Playing the Game' section.",
+    "mechanics": {
+      "process": "Make a Dexterity (Stealth) check and compare it to the Passive Perception of any creature that might notice you.",
+      "success": "If you succeed, you gain the benefits of being hidden (unseen). Attack rolls against you have disadvantage, and your attack rolls have advantage until you are discovered or stop hiding."
+    },
+    "prerequisite": "You must be heavily obscured from view or behind cover."
+  },
+  {
+    "name": "Ready",
+    "type": "Action",
+    "description": "You prepare to take a specific action later, using your reaction to execute it when a trigger you specify occurs.",
+    "mechanics": {
+      "process": [
+        "Choose the action you will take and the perceptible circumstance (the trigger) that will cause you to take it.",
+        "When the trigger occurs, you can use your reaction to take the readied action, or you can choose to ignore the trigger."
+      ],
+      "limitations": "You can only take a single action with this feature. You cannot ready a Bonus Action or movement, only a single Action."
+    }
+  },
+  {
+    "name": "Search",
+    "type": "Action",
+    "description": "You devote your attention to finding something. Depending on the nature of your search, the GM might have you make a Wisdom (Perception) or Intelligence (Investigation) check.",
+    "examples": "Looking for traps, searching for a hidden door, scanning the crowd for a pickpocket."
+  },
+  {
+    "name": "Use an Object",
+    "type": "Action",
+    "description": "You normally interact with one object for free during your turn (e.g., drawing a weapon, opening a door). This action is required when you want to interact with a second object, or when an interaction is particularly complex.",
+    "examples": "Drinking a potion, administering a potion to another creature, throwing a lever, spreading caltrops."
+  },
+  {
+    "name": "Grapple",
+    "type": "Special Melee Attack",
+    "description": "You attempt to seize a creature. A grappled creature's speed becomes 0, and it can't benefit from any bonus to its speed.",
+    "mechanics": {
+      "process": [
+        "The attacker makes a Strength (Athletics) check.",
+        "The target contests it with their choice of Strength (Athletics) or Dexterity (Acrobatics) check.",
+        "The attacker wins the contest if their check is higher.",
+        "On a success, the target is grappled."
+      ],
+      "prerequisite": "You must have at least one free hand to make the attempt."
+    }
+  },
+  {
+    "name": "Shove",
+    "type": "Special Melee Attack",
+    "description": "You attempt to push a creature either away from you or to the ground.",
+    "mechanics": {
+      "process": "Uses the same contested check mechanics as a Grapple (Athletics vs. Athletics/Acrobatics).",
+      "on_success": "You either push the target 5 feet away from you or knock it prone."
+    }
+  },
+  {
+    "name": "Improvise an Action",
+    "type": "Action",
+    "description": "Your character can try to do anything not covered by the other actions. The GM determines the outcome, and might call for an ability check to see if you succeed.",
+    "examples": [
+      "Tip over a table to create cover.",
+      "Attempt to dazzle a creature by reflecting sunlight with your shield.",
+      "Throw sand in a creature's eyes to distract it.",
+      "Use a rope to try and lasso a foe."
+    ],
+    "mechanics": "The GM will decide if your action is possible and what kind of check (if any) is required. This is the heart of creative play."
+  },
+  {
+    "name": "Opportunity Attack",
+    "type": "Reaction",
+    "description": "A special reaction you can take when a hostile creature you can see moves out of your reach.",
+    "trigger": "A creature leaves your reach using its movement, action, or bonus action.",
+    "mechanics": "You can use your reaction to make one melee attack against the provoking creature. The attack occurs right before the creature leaves your reach.",
+    "avoidance": "You can avoid provoking an opportunity attack by taking the Disengage action, teleporting, or being moved without using your own movement (e.g., being pushed)."
+  },
+  {
+    "name": "Two-Weapon Fighting",
+    "type": "Bonus Action",
+    "description": "When you take the Attack action and attack with a light melee weapon that you're holding in one hand, you can use a bonus action to attack with a different light melee weapon that you're holding in the other hand.",
+    "mechanics": "You don't add your ability modifier to the damage of the bonus action attack, unless that modifier is negative."
+  },
+  {
+    "name": "Use Class Feature",
+    "type": "Varies",
+    "description": "Many class features, such as a Bard's Bardic Inspiration or a Rogue's Cunning Action, require the use of a Bonus Action. Other features, like a Fighter's Second Wind or a Wizard's Arcane Recovery, have specific activation requirements.",
+    "mechanics": "Refer to the specific class feature description for the type of action required (Action, Bonus Action, Reaction, etc.) and its effects."
+  }
+]

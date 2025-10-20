@@ -1,0 +1,139 @@
+{
+  "armor": [
+    {
+      "name": "Padded Armor",
+      "type": "Light",
+      "ac": 11,
+      "cost": "5 gp",
+      "common_users": ["Any"]
+    },
+    {
+      "name": "Leather Armor",
+      "type": "Light",
+      "ac": 11,
+      "cost": "10 gp",
+      "common_users": ["Any"]
+    },
+    {
+      "name": "Studded Leather Armor",
+      "type": "Light",
+      "ac": 12,
+      "cost": "45 gp",
+      "common_users": ["Bard", "Rogue", "Ranger"]
+    },
+    {
+      "name": "Hide Armor",
+      "type": "Medium",
+      "ac": 12,
+      "cost": "10 gp",
+      "common_users": ["Barbarian", "Druid", "Fighter", "Ranger"]
+    },
+    {
+      "name": "Chain Shirt",
+      "type": "Medium",
+      "ac": 13,
+      "cost": "50 gp",
+      "common_users": ["Fighter", "Paladin", "Ranger"]
+    },
+    {
+      "name": "Scale Mail",
+      "type": "Medium",
+      "ac": 14,
+      "cost": "50 gp",
+      "common_users": ["Fighter", "Paladin", "Ranger"]
+    },
+    {
+      "name": "Breastplate",
+      "type": "Medium",
+      "ac": 14,
+      "cost": "400 gp",
+      "common_users": ["Fighter", "Paladin", "Ranger"]
+    },
+    {
+      "name": "Half Plate",
+      "type": "Medium",
+      "ac": 15,
+      "cost": "750 gp",
+      "common_users": ["Fighter", "Paladin", "Ranger"]
+    },
+    {
+      "name": "Ring Mail",
+      "type": "Heavy",
+      "ac": 14,
+      "cost": "30 gp",
+      "common_users": ["Fighter", "Paladin"]
+    },
+    {
+      "name": "Chain Mail",
+      "type": "Heavy",
+      "ac": 16,
+      "cost": "75 gp",
+      "common_users": ["Fighter", "Paladin"]
+    },
+    {
+      "name": "Splint Mail",
+      "type": "Heavy",
+      "ac": 17,
+      "cost": "200 gp",
+      "common_users": ["Fighter", "Paladin"]
+    },
+    {
+      "name": "Plate Mail",
+      "type": "Heavy",
+      "ac": 18,
+      "cost": "1500 gp",
+      "common_users": ["Fighter", "Paladin"]
+    },
+    {
+      "name": "Shield",
+      "type": "Shield",
+      "ac": 2,
+      "cost": "10 gp",
+      "common_users": ["Any"]
+    }
+  ],
+  "packs": [
+    {
+      "name": "Burglar's Pack",
+      "contents": ["Backpack", "Bag of 1000 ball bearings", "10 feet of string", "Bell", "5 candles", "Crowbar", "Hammer", "10 pitons", "Hooded lantern", "2 flasks of oil", "5 days rations", "Tinderbox", "Waterskin", "50 feet of hempen rope"],
+      "cost": "16 gp",
+      "common_users": ["Rogue"]
+    },
+    {
+      "name": "Diplomat's Pack",
+      "contents": ["Chest", "2 cases for maps and scrolls", "Set of fine clothes", "Bottle of ink", "Ink pen", "Lamp", "2 flasks of oil", "5 sheets of paper", "Vial of perfume", "Sealing wax", "Soap"],
+      "cost": "39 gp",
+      "common_users": ["Bard", "Paladin"]
+    },
+    {
+      "name": "Dungeoneer's Pack",
+      "contents": ["Backpack", "Crowbar", "Hammer", "10 pitons", "10 torches", "Tinderbox", "10 days rations", "Waterskin", "50 feet of hempen rope"],
+      "cost": "12 gp",
+      "common_users": ["Any"]
+    },
+    {
+      "name": "Entertainer's Pack",
+      "contents": ["Backpack", "Bedroll", "2 costumes", "5 candles", "5 days rations", "Waterskin", "Disguise kit"],
+      "cost": "40 gp",
+      "common_users": ["Bard"]
+    },
+    {
+      "name": "Explorer's Pack",
+      "contents": ["Backpack", "Bedroll", "Mess kit", "Tinderbox", "10 torches", "10 days rations", "Waterskin", "50 feet of hempen rope"],
+      "cost": "10 gp",
+      "common_users": ["Any"]
+    },
+    {
+      "name": "Priest's Pack",
+      "contents": ["Backpack", "Blanket", "10 candles", "Tinderbox", "Alms box", "2 blocks of incense", "Censer", "Vestments", "2 days rations", "Waterskin"],
+      "cost": "19 gp",
+      "common_users": ["Cleric", "Paladin"]
+    },
+    {
+      "name": "Scholar's Pack",
+      "contents": ["Backpack", "Book of lore", "Bottle of ink", "Ink pen", "10 sheets of parchment", "Little bag of sand", "Small knife"],
+      "cost": "40 gp",
+      "common_users": ["Wizard", "Cleric"]
+    }
+  ]
+}

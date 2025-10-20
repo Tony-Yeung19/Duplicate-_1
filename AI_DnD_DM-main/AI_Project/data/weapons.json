@@ -1,0 +1,184 @@
+{
+  "weapons": [
+    {
+      "name": "Dagger",
+      "category": "Simple",
+      "weapon_type": "Melee",
+      "cost": "2 gp",
+      "damage": "1d4",
+      "damage_type": "Piercing",
+      "properties": ["Finesse", "Light", "Thrown (range 20/60)"],
+      "common_users": ["Rogue", "Wizard", "Sorcerer", "Bard", "Monk", "Any"]
+    },
+    {
+      "name": "Quarterstaff",
+      "category": "Simple",
+      "weapon_type": "Melee",
+      "cost": "2 sp",
+      "damage": "1d6",
+      "damage_type": "Bludgeoning",
+      "properties": ["Versatile (1d8)"],
+      "common_users": ["Druid", "Monk", "Cleric", "Wizard", "Warlock"]
+    },
+    {
+      "name": "Light Crossbow",
+      "category": "Simple",
+      "weapon_type": "Ranged",
+      "cost": "25 gp",
+      "damage": "1d8",
+      "damage_type": "Piercing",
+      "properties": ["Ammunition (range 80/320)", "Loading", "Two-Handed"],
+      "common_users": ["Wizard", "Sorcerer", "Warlock", "Rogue", "Any non-martial"]
+    },
+    {
+      "name": "Mace",
+      "category": "Simple",
+      "weapon_type": "Melee",
+      "cost": "5 gp",
+      "damage": "1d6",
+      "damage_type": "Bludgeoning",
+      "properties": [],
+      "common_users": ["Cleric", "Paladin"]
+    },
+    {
+      "name": "Shortbow",
+      "category": "Simple",
+      "weapon_type": "Ranged",
+      "cost": "25 gp",
+      "damage": "1d6",
+      "damage_type": "Piercing",
+      "properties": ["Ammunition (range 80/320)", "Two-Handed"],
+      "common_users": ["Ranger", "Rogue", "Bard", "Fighter (Dexterity)"]
+    },
+    {
+      "name": "Handaxe",
+      "category": "Simple",
+      "weapon_type": "Melee",
+      "cost": "5 gp",
+      "damage": "1d6",
+      "damage_type": "Slashing",
+      "properties": ["Light", "Thrown (range 20/60)"],
+      "common_users": ["Barbarian", "Fighter", "Dwarf", "Any"]
+    },
+    {
+      "name": "Greatclub",
+      "category": "Simple",
+      "weapon_type": "Melee",
+      "cost": "2 sp",
+      "damage": "1d8",
+      "damage_type": "Bludgeoning",
+      "properties": ["Two-Handed"],
+      "common_users": ["Barbarian", "Low-level characters"]
+    },
+    {
+      "name": "Javelin",
+      "category": "Simple",
+      "weapon_type": "Melee",
+      "cost": "5 sp",
+      "damage": "1d6",
+      "damage_type": "Piercing",
+      "properties": ["Thrown (range 30/120)"],
+      "common_users": ["Barbarian", "Fighter", "Paladin", "Ranger", "Any melee class"]
+    },
+    {
+      "name": "Shortsword",
+      "category": "Martial",
+      "weapon_type": "Melee",
+      "cost": "10 gp",
+      "damage": "1d6",
+      "damage_type": "Piercing",
+      "properties": ["Finesse", "Light"],
+      "common_users": ["Rogue", "Bard", "Ranger", "Fighter (Dexterity)", "Monk"]
+    },
+    {
+      "name": "Rapier",
+      "category": "Martial",
+      "weapon_type": "Melee",
+      "cost": "25 gp",
+      "damage": "1d8",
+      "damage_type": "Piercing",
+      "properties": ["Finesse"],
+      "common_users": ["Rogue", "Bard", "Fighter (Dexterity)"]
+    },
+    {
+      "name": "Longsword",
+      "category": "Martial",
+      "weapon_type": "Melee",
+      "cost": "15 gp",
+      "damage": "1d8",
+      "damage_type": "Slashing",
+      "properties": ["Versatile (1d10)"],
+      "common_users": ["Fighter", "Paladin", "Ranger", "Cleric (Protector)"]
+    },
+    {
+      "name": "Warhammer",
+      "category": "Martial",
+      "weapon_type": "Melee",
+      "cost": "15 gp",
+      "damage": "1d8",
+      "damage_type": "Bludgeoning",
+      "properties": ["Versatile (1d10)"],
+      "common_users": ["Fighter", "Paladin", "Cleric (Protector)", "Dwarf"]
+    },
+    {
+      "name": "Greataxe",
+      "category": "Martial",
+      "weapon_type": "Melee",
+      "cost": "30 gp",
+      "damage": "1d12",
+      "damage_type": "Slashing",
+      "properties": ["Heavy", "Two-Handed"],
+      "common_users": ["Barbarian", "Fighter (Strength)"]
+    },
+    {
+      "name": "Greatsword",
+      "category": "Martial",
+      "weapon_type": "Melee",
+      "cost": "50 gp",
+      "damage": "2d6",
+      "damage_type": "Slashing",
+      "properties": ["Heavy", "Two-Handed"],
+      "common_users": ["Fighter (Strength)", "Paladin", "Barbarian"]
+    },
+    {
+      "name": "Maul",
+      "category": "Martial",
+      "weapon_type": "Melee",
+      "cost": "10 gp",
+      "damage": "2d6",
+      "damage_type": "Bludgeoning",
+      "properties": ["Heavy", "Two-Handed"],
+      "common_users": ["Fighter (Strength)", "Paladin"]
+    },
+    {
+      "name": "Longbow",
+      "category": "Martial",
+      "weapon_type": "Ranged",
+      "cost": "50 gp",
+      "damage": "1d8",
+      "damage_type": "Piercing",
+      "properties": ["Ammunition (range 150/600)", "Heavy", "Two-Handed"],
+      "common_users": ["Ranger", "Fighter (Dexterity)"]
+    },
+    {
+      "name": "Scimitar",
+      "category": "Martial",
+      "weapon_type": "Melee",
+      "cost": "25 gp",
+      "damage": "1d6",
+      "damage_type": "Slashing",
+      "properties": ["Finesse", "Light"],
+      "common_users": ["Druid", "Ranger", "Rogue", "Bard"]
+    }
+  ],
+  "weapon_properties": {
+    "Ammunition": "You can use a weapon that has the ammunition property to make a ranged attack only if you have ammunition to fire from the weapon. Each time you attack with the weapon, you expend one piece of ammunition. The weapon's range is listed in parentheses.",
+    "Finesse": "When making an attack with a finesse weapon, you use your choice of your Strength or Dexterity modifier for the attack and damage rolls. You must use the same modifier for both rolls.",
+    "Heavy": "Small creatures have disadvantage on attack rolls with heavy weapons.",
+    "Light": "A light weapon is small and easy to handle, making it ideal for two-weapon fighting.",
+    "Loading": "Because of the time required to load this weapon, you can fire only one piece of ammunition from it when you use an action, bonus action, or reaction to fire it, regardless of the number of attacks you can normally make.",
+    "Two-Handed": "This weapon requires two hands when you attack with it.",
+    "Thrown": "If a weapon has the thrown property, you can throw the weapon to make a ranged attack. The range is shown in parentheses.",
+    "Versatile": "This weapon can be used with one or two hands. A damage value in parentheses appears with the property—the damage when the weapon is used with two hands to make a melee attack."
+  }
+}
