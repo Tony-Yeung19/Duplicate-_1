@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>D&D Combat Arena</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <header>
+      <h1>D&amp;D Combat Arena</h1>
+      <p>Choose a hero, face a monster, and let the dice determine your fate.</p>
+    </header>
+
+    <main>
+      <section class="selection-panel">
+        <div class="selector">
+          <label for="player-select">Select your hero</label>
+          <select id="player-select"></select>
+        </div>
+        <div class="selector">
+          <label for="monster-select">Select a monster</label>
+          <select id="monster-select"></select>
+        </div>
+        <button id="start-game">Start Encounter</button>
+        <p id="status-message" class="status"></p>
+      </section>
+
+      <section id="battlefield" class="hidden">
+        <div class="combatants">
+          <article class="card" id="player-card">
+            <h2 class="card-title">Hero</h2>
+            <div class="stats">
+              <p><strong>Name:</strong> <span data-field="name"></span></p>
+              <p><strong>Class:</strong> <span data-field="class"></span></p>
+              <p><strong>HP:</strong> <span data-field="hp"></span></p>
+              <p><strong>AC:</strong> <span data-field="ac"></span></p>
+            </div>
+            <div class="actions">
+              <h3>Available Actions</h3>
+              <div id="player-actions" class="action-buttons"></div>
+            </div>
+          </article>
+
+          <article class="card" id="monster-card">
+            <h2 class="card-title">Monster</h2>
+            <div class="stats">
+              <p><strong>Name:</strong> <span data-field="name"></span></p>
+              <p><strong>HP:</strong> <span data-field="hp"></span></p>
+              <p><strong>AC:</strong> <span data-field="ac"></span></p>
+            </div>
+            <p class="description" data-field="description"></p>
+          </article>
+        </div>
+
+        <aside class="turn-info">
+          <p><strong>Current Round:</strong> <span id="round-number">1</span></p>
+          <p><strong>Active Combatant:</strong> <span id="active-turn">-</span></p>
+        </aside>
+
+        <section class="log">
+          <h2>Combat Log</h2>
+          <ul id="log-list"></ul>
+        </section>
+      </section>
+    </main>
+
+    <footer>
+      <p>Built with Flask, HTML, and CSS. Dice rolls provided by the existing simulator.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </body>
+</html>
