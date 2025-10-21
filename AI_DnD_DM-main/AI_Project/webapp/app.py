@@ -3,12 +3,16 @@ from __future__ import annotations
 
 from flask import Flask, jsonify, render_template, request
 
-from .game_manager import (
-    GameError,
-    available_monsters,
-    available_players,
-    create_session,
+from .character_manager import (
+    class_options,
+    create_character as create_new_character,
+    list_classes,
+    list_custom_characters,
+    load_custom_character,
+    point_buy_info,
+    roll_scores,
 )
+from .game_manager import GameError, available_monsters, available_players, create_session
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 _sessions = {}
@@ -27,6 +31,71 @@ def get_players():
 @app.get("/api/monsters")
 def get_monsters():
     return jsonify({"monsters": available_monsters()})
+
+
+@app.get("/api/classes")
+def get_classes():
+    return jsonify({"classes": list_classes()})
+
+
+@app.get("/api/classes/<class_name>")
+def get_class(class_name: str):
+    try:
+        options = class_options(class_name)
+    except KeyError:
+        return jsonify({"error": "Class not found"}), 404
+    return jsonify({"class": options})
+
+
+@app.get("/api/point-buy")
+def get_point_buy():
+    return jsonify(point_buy_info())
+
+
+@app.post("/api/ability-scores")
+def post_ability_scores():
+    data = request.get_json(force=True, silent=True) or {}
+    method = data.get("method", "4d6-drop-lowest")
+    try:
+        scores = roll_scores(method)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    return jsonify({"scores": scores})
+
+
+@app.get("/api/characters")
+def get_characters():
+    characters = [
+        {
+            "id": character.get("id"),
+            "name": character.get("name"),
+            "class": character.get("class"),
+            "max_hit_points": character.get("max_hit_points"),
+            "armor_class": character.get("armor_class"),
+            "description": character.get("description", ""),
+        }
+        for character in list_custom_characters()
+    ]
+    return jsonify({"characters": characters})
+
+
+@app.get("/api/characters/<character_id>")
+def get_character(character_id: str):
+    try:
+        character = load_custom_character(character_id)
+    except (FileNotFoundError, OSError, ValueError):
+        return jsonify({"error": "Character not found"}), 404
+    return jsonify({"character": character})
+
+
+@app.post("/api/characters")
+def create_character():
+    payload = request.get_json(force=True)
+    try:
+        character = create_new_character(payload)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    return jsonify({"character": character}), 201
 
 
 @app.post("/api/start-game")

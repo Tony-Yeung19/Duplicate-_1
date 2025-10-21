@@ -2,16 +2,182 @@ import sys
 import os
 import json
 import time
+import glob
+import re
+from typing import Dict, Iterable, List, Optional, Tuple
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
 
-from simulations.loader import load_characters, load_equipment, load_weapons, load_spells, load_rules
+PLAYER_DATA_DIR = os.path.join(os.path.dirname(__file__), 'player_data')
+
+from simulations.loader import (
+    load_characters,
+    load_equipment,
+    load_weapons,
+    load_spells,
+    load_rules,
+)
 from simulations.dice import roll_dice
+
+
+def _slugify(value: str) -> str:
+    """Create a filesystem-friendly identifier from ``value``."""
+    value = value.strip().lower()
+    value = re.sub(r"[^a-z0-9]+", "-", value)
+    value = re.sub(r"-+", "-", value).strip("-")
+    return value or "hero"
+
+
+def _ensure_player_dir() -> str:
+    os.makedirs(PLAYER_DATA_DIR, exist_ok=True)
+    return PLAYER_DATA_DIR
+
+
+def load_resources() -> Dict[str, object]:
+    """Load game reference data for character creation workflows."""
+    return {
+        "classes": load_characters(),
+        "weapons": load_weapons(),
+        "equipment": load_equipment(),
+        "spells": load_spells(),
+        "rules": load_rules(),
+    }
+
+
+def _character_filepath(character_id: str) -> str:
+    return os.path.join(_ensure_player_dir(), f"{character_id}.json")
+
+
+def _existing_character_ids() -> List[str]:
+    if not os.path.isdir(PLAYER_DATA_DIR):
+        return []
+    pattern = os.path.join(PLAYER_DATA_DIR, "*.json")
+    return [os.path.splitext(os.path.basename(path))[0] for path in glob.glob(pattern)]
+
+
+def _unique_character_id(name: str) -> str:
+    base = _slugify(name)
+    if not base:
+        base = "hero"
+    existing = set(_existing_character_ids())
+    if base not in existing:
+        return base
+    index = 2
+    while f"{base}-{index}" in existing:
+        index += 1
+    return f"{base}-{index}"
+
+
+def save_character(character: Dict[str, object]) -> Dict[str, object]:
+    """Persist a character profile to disk."""
+    character_id = character.get("id") or _unique_character_id(character.get("name", "hero"))
+    character["id"] = character_id
+    character.setdefault("type", "player")
+    if "max_hit_points" in character and "current_hit_points" not in character:
+        character["current_hit_points"] = character["max_hit_points"]
+    filepath = _character_filepath(character_id)
+    with open(filepath, "w", encoding="utf-8") as handle:
+        json.dump(character, handle, indent=2)
+    return character
+
+
+def list_saved_characters() -> List[Dict[str, object]]:
+    """Return all saved characters from the player data directory."""
+    characters: List[Dict[str, object]] = []
+    if not os.path.isdir(PLAYER_DATA_DIR):
+        return characters
+    for path in glob.glob(os.path.join(PLAYER_DATA_DIR, "*.json")):
+        try:
+            with open(path, "r", encoding="utf-8") as handle:
+                data = json.load(handle)
+                if isinstance(data, dict):
+                    data.setdefault("id", os.path.splitext(os.path.basename(path))[0])
+                    data.setdefault("type", "player")
+                    if "current_hit_points" not in data and "max_hit_points" in data:
+                        data["current_hit_points"] = data["max_hit_points"]
+                    characters.append(data)
+        except (OSError, json.JSONDecodeError):
+            continue
+    return characters
+
+
+def load_character(character_id: str) -> Dict[str, object]:
+    """Load a previously created character by id."""
+    filepath = _character_filepath(character_id)
+    with open(filepath, "r", encoding="utf-8") as handle:
+        data = json.load(handle)
+        data.setdefault("id", character_id)
+        data.setdefault("type", "player")
+        if "current_hit_points" not in data and "max_hit_points" in data:
+            data["current_hit_points"] = data["max_hit_points"]
+    return data
+
+def roll_ability_scores(method: str = "4d6-drop-lowest", rolls: int = 6) -> List[int]:
+    """Return a list of generated ability scores."""
+
+    method = method.lower()
+
+    def roll(method_key: str) -> int:
+        if method_key == "4d6-drop-lowest":
+            dice = sorted([roll_dice("1d6") for _ in range(4)])
+            return sum(dice[1:])
+        if method_key == "3d6":
+            return roll_dice("3d6")
+        if method_key == "2d6+6":
+            return roll_dice("2d6") + 6
+        raise ValueError(f"Unknown ability score method: {method}")
+
+    return [roll(method) for _ in range(rolls)]
+
+
+def point_buy_budget() -> Tuple[int, Dict[int, int]]:
+    """Return the standard 27-point point-buy budget and costs."""
+
+    return 27, {8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9}
+
 
 def calculate_modifier(score):
     """Calculates ability modifier from a score."""
     return (score - 10) // 2
+
+
+def _expand_skill_options(skill_options: Iterable[str], rules_data: Optional[dict]) -> List[str]:
+    """Return the concrete list of skill options for a class."""
+
+    if not skill_options:
+        return []
+
+    if "Any" in skill_options:
+        skills: List[str] = []
+        if rules_data:
+            for ability_skills in rules_data.get("skills", {}).values():
+                if isinstance(ability_skills, list):
+                    skills.extend(ability_skills)
+        if not skills:
+            skills = [
+                "Acrobatics",
+                "Animal Handling",
+                "Arcana",
+                "Athletics",
+                "Deception",
+                "History",
+                "Insight",
+                "Intimidation",
+                "Investigation",
+                "Medicine",
+                "Nature",
+                "Perception",
+                "Performance",
+                "Persuasion",
+                "Religion",
+                "Sleight of Hand",
+                "Stealth",
+                "Survival",
+            ]
+        return sorted(set(skills))
+
+    return list(skill_options)
 
 def get_valid_input(prompt, validation_func, error_msg="Invalid input. Please try again."):
     """Helper function to get valid input from user."""
@@ -179,6 +345,234 @@ def calculate_ac(armor_ac, dex_mod, armor_type=None):
         return armor_ac + min(2, dex_mod)  #Medium armor max +2 from Dex
     else:  #Light armor or no armor
         return armor_ac + dex_mod
+
+
+def build_character_profile(
+    character_name: str,
+    class_name: str,
+    abilities: Dict[str, int],
+    chosen_skills: Iterable[str],
+    equipment_list: Iterable[str],
+    chosen_spells: Optional[Iterable[str]] = None,
+    description: str = "",
+    resources: Optional[Dict[str, object]] = None,
+    save: bool = True,
+    metadata: Optional[Dict[str, object]] = None,
+) -> Dict[str, object]:
+    """Create a fully populated character profile from structured selections."""
+
+    resources = resources or load_resources()
+    classes = resources.get("classes", [])
+    weapons = resources.get("weapons", {})
+    equipment = resources.get("equipment", {})
+    spells = resources.get("spells", [])
+    rules = resources.get("rules")
+
+    class_data = None
+    for cls in classes:
+        if cls.get("class", "").lower() == class_name.lower():
+            class_data = cls
+            class_name = cls.get("class", class_name)
+            break
+
+    if not class_data:
+        raise ValueError(f"Unknown class: {class_name}")
+
+    normalized_abilities: Dict[str, int] = {}
+    required_abilities = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]
+    for ability in required_abilities:
+        if ability not in abilities:
+            raise ValueError(f"Missing ability score for {ability}")
+        normalized_abilities[ability] = int(abilities[ability])
+
+    chosen_skills = list(dict.fromkeys(chosen_skills or []))
+    skill_limit = int(class_data.get("skill_choices", 0) or 0)
+    valid_skills = _expand_skill_options(class_data.get("skill_options", []), rules)
+    if skill_limit and len(chosen_skills) > skill_limit:
+        raise ValueError(f"Too many skills selected (max {skill_limit})")
+    if valid_skills:
+        for skill in chosen_skills:
+            if skill not in valid_skills:
+                raise ValueError(f"{skill} is not a valid skill choice for {class_name}")
+
+    equipment_names = [item for item in (equipment_list or [])]
+
+    armor_ac = 10
+    armor_type = None
+    shield_bonus = 0
+    armor_entries = equipment.get("armor", [])
+    for item_name in equipment_names:
+        for armor in armor_entries:
+            if armor.get("name", "").lower() == str(item_name).lower():
+                if armor.get("type") == "Shield":
+                    shield_bonus = max(shield_bonus, 2)
+                else:
+                    armor_ac = armor.get("ac", armor_ac)
+                    armor_type = armor.get("type", armor_type)
+                break
+
+    dex_mod = calculate_modifier(normalized_abilities["dexterity"])
+    con_mod = calculate_modifier(normalized_abilities["constitution"])
+
+    armor_type_for_calc = armor_type if armor_type in {"Light", "Medium", "Heavy"} else None
+    ac = calculate_ac(armor_ac, dex_mod, armor_type_for_calc) + shield_bonus
+
+    hit_die = class_data.get("hit_die", "d8")
+    try:
+        hit_die_max = int(str(hit_die).replace("d", ""))
+    except ValueError:
+        hit_die_max = 8
+    hp = hit_die_max + con_mod
+    max_hp = max(hp, 1)
+
+    proficiency_bonus = 2
+    actions: List[Dict[str, object]] = []
+
+    for item_name in equipment_names:
+        for weapon in weapons.get("weapons", []):
+            if weapon.get("name", "").lower() != str(item_name).lower():
+                continue
+            properties = weapon.get("properties", []) or []
+            if "Finesse" in properties:
+                ability_mod = max(calculate_modifier(normalized_abilities["strength"]), dex_mod)
+            elif weapon.get("weapon_type") == "Melee":
+                ability_mod = calculate_modifier(normalized_abilities["strength"])
+            else:
+                ability_mod = dex_mod
+            actions.append(
+                {
+                    "name": weapon["name"],
+                    "type": f"{weapon.get('weapon_type', 'Melee')} Weapon Attack",
+                    "attack_bonus": proficiency_bonus + ability_mod,
+                    "damage_dice": weapon.get("damage", "1d6"),
+                    "damage_bonus": ability_mod,
+                    "damage_type": weapon.get("damage_type", "damage"),
+                    "properties": properties,
+                }
+            )
+            break
+
+    class_features = class_data.get("features", []) or []
+    spellcasting_ability_map = {
+        "Wizard": "intelligence",
+        "Sorcerer": "charisma",
+        "Warlock": "charisma",
+        "Bard": "charisma",
+        "Cleric": "wisdom",
+        "Druid": "wisdom",
+        "Paladin": "charisma",
+        "Ranger": "wisdom",
+    }
+
+    for feature in class_features:
+        if feature.get("level") != 1:
+            continue
+        action = {
+            "name": feature.get("name", "Feature"),
+            "type": feature.get("type", "Class Feature"),
+            "description": feature.get("description", ""),
+        }
+        for prop in [
+            "uses",
+            "recharge",
+            "action_type",
+            "damage_dice",
+            "damage_bonus",
+            "damage_type",
+            "healing_dice",
+            "save_dc",
+            "save_ability",
+            "range",
+            "conditions",
+            "die_size",
+            "spellcasting_ability",
+            "spell_slots",
+            "cantrips_known",
+            "passive",
+        ]:
+            if prop in feature:
+                action[prop] = feature[prop]
+
+        feature_spell_ability = feature.get("spellcasting_ability")
+        if not feature_spell_ability and class_name in spellcasting_ability_map:
+            feature_spell_ability = spellcasting_ability_map[class_name]
+
+        if feature.get("damage_dice") and feature_spell_ability:
+            ability_mod = calculate_modifier(normalized_abilities[feature_spell_ability])
+            action["attack_bonus"] = proficiency_bonus + ability_mod
+
+        actions.append(action)
+
+    chosen_spells = list(dict.fromkeys(chosen_spells or []))
+    known_spells = {spell.get("name") for spell in spells if spell.get("name")}
+    for spell_name in chosen_spells:
+        if spell_name not in known_spells:
+            raise ValueError(f"Unknown spell: {spell_name}")
+
+    if class_name in spellcasting_ability_map:
+        ability_key = spellcasting_ability_map[class_name]
+        ability_mod = calculate_modifier(normalized_abilities[ability_key])
+        save_dc = 8 + proficiency_bonus + ability_mod
+
+        basic_cantrips = {
+            "Wizard": {"name": "Fire Bolt", "damage": "1d10", "type": "Fire"},
+            "Sorcerer": {"name": "Fire Bolt", "damage": "1d10", "type": "Fire"},
+            "Warlock": {"name": "Eldritch Blast", "damage": "1d10", "type": "Force"},
+            "Bard": {"name": "Vicious Mockery", "damage": "1d4", "type": "Psychic"},
+            "Cleric": {"name": "Sacred Flame", "damage": "1d8", "type": "Radiant"},
+            "Druid": {"name": "Produce Flame", "damage": "1d8", "type": "Fire"},
+        }
+
+        if class_name in basic_cantrips:
+            cantrip = basic_cantrips[class_name]
+            action = {
+                "name": cantrip["name"],
+                "type": "Spell Attack",
+                "damage_dice": cantrip["damage"],
+                "damage_bonus": 0,
+                "damage_type": cantrip["type"],
+            }
+            if class_name == "Cleric":
+                action["save_dc"] = save_dc
+                action["save_ability"] = "DEX"
+                action["description"] = "The target must succeed on a Dexterity saving throw or take radiant damage."
+            else:
+                action["attack_bonus"] = proficiency_bonus + ability_mod
+            actions.append(action)
+
+    initiative_bonus = dex_mod
+
+    character: Dict[str, object] = {
+        "id": None,
+        "name": character_name,
+        "class": class_name,
+        "level": 1,
+        "description": description or f"A fledgling level 1 {class_name}.",
+        "stats": normalized_abilities,
+        "hit_points": max_hp,
+        "max_hit_points": max_hp,
+        "current_hit_points": max_hp,
+        "armor_class": ac,
+        "skills": chosen_skills,
+        "equipment": equipment_names,
+        "spells": chosen_spells,
+        "actions": actions,
+        "proficiency_bonus": proficiency_bonus,
+        "initiative_bonus": initiative_bonus,
+        "type": "player",
+    }
+
+    if metadata:
+        character.update(metadata)
+
+    if save:
+        character = save_character(character)
+    else:
+        # Ensure the character at least has a stable id even if unsaved.
+        character.setdefault("id", _slugify(character_name))
+
+    return character
+
 
 def create_character():
     """Main function to guide through character creation."""
