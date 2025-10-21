@@ -1,0 +1,76 @@
+{
+  "id": "tony",
+  "name": "Tony",
+  "class": "Bard",
+  "level": 1,
+  "type": "player",
+  "stats": {
+    "strength": 14,
+    "dexterity": 13,
+    "constitution": 12,
+    "intelligence": 11,
+    "wisdom": 11,
+    "charisma": 7
+  },
+  "skills": [
+    "Acrobatics",
+    "Insight",
+    "Performance"
+  ],
+  "equipment": [
+    "Mace",
+    "Padded Armor",
+    "Diplomat's Pack"
+  ],
+  "spells": [
+    "Cure Wounds",
+    "Sleep"
+  ],
+  "actions": [
+    {
+      "name": "Mace",
+      "type": "Melee Weapon Attack",
+      "attack_bonus": 4,
+      "damage_dice": "1d6",
+      "damage_bonus": 2,
+      "damage_type": "Bludgeoning",
+      "properties": [],
+      "description": ""
+    },
+    {
+      "name": "Vicious Mockery",
+      "type": "Spell Attack",
+      "attack_bonus": 0,
+      "damage_dice": "1d4",
+      "damage_bonus": 0,
+      "damage_type": "Psychic",
+      "save_dc": null,
+      "save_ability": null
+    },
+    {
+      "name": "Bardic Inspiration",
+      "type": "Class Feature",
+      "description": "As a bonus action, grant a Bardic Inspiration die (d6) to an ally. They can add it to one ability check, attack roll, or saving throw.",
+      "uses": 3,
+      "recharge": "long rest",
+      "action_type": "bonus",
+      "die_size": "d6"
+    },
+    {
+      "name": "Spellcasting",
+      "type": "Spellcasting",
+      "description": "You are a full spellcaster using the Bard spell list. Your spellcasting ability is Charisma.",
+      "spellcasting_ability": "charisma",
+      "spell_slots": [
+        2
+      ],
+      "cantrips_known": 2
+    }
+  ],
+  "proficiency_bonus": 2,
+  "max_hit_points": 9,
+  "hit_points": 9,
+  "current_hit_points": 9,
+  "armor_class": 12,
+  "description": "A newly forged Bard ready for adventure."
+}

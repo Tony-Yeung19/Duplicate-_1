@@ -1,0 +1,71 @@
+{
+  "id": "sam",
+  "name": "sam",
+  "class": "Warlock",
+  "level": 1,
+  "type": "player",
+  "stats": {
+    "strength": 18,
+    "dexterity": 17,
+    "constitution": 15,
+    "intelligence": 15,
+    "wisdom": 13,
+    "charisma": 12
+  },
+  "skills": [
+    "Arcana",
+    "Nature"
+  ],
+  "equipment": [
+    "Javelin",
+    "Studded Leather Armor"
+  ],
+  "spells": [],
+  "actions": [
+    {
+      "name": "Javelin",
+      "type": "Melee Weapon Attack",
+      "attack_bonus": 6,
+      "damage_dice": "1d6",
+      "damage_bonus": 4,
+      "damage_type": "Piercing",
+      "properties": [
+        "Thrown (range 30/120)"
+      ],
+      "description": "Thrown (range 30/120)"
+    },
+    {
+      "name": "Eldritch Blast",
+      "type": "Spell Attack",
+      "attack_bonus": 3,
+      "damage_dice": "1d10",
+      "damage_bonus": 0,
+      "damage_type": "Force",
+      "save_dc": null,
+      "save_ability": null
+    },
+    {
+      "name": "Pact Magic",
+      "type": "Spellcasting",
+      "description": "You are a unique spellcaster with a small number of powerful spell slots that recharge on a short rest. Your spellcasting ability is Charisma.",
+      "recharge": "short rest",
+      "spellcasting_ability": "charisma",
+      "spell_slots": [
+        1
+      ],
+      "cantrips_known": 2
+    },
+    {
+      "name": "Otherworldly Patron",
+      "type": "Class Feature",
+      "description": "Choose a being that grants you your powers (e.g., The Fiend).",
+      "passive": true
+    }
+  ],
+  "proficiency_bonus": 2,
+  "max_hit_points": 10,
+  "hit_points": 10,
+  "current_hit_points": 10,
+  "armor_class": 15,
+  "description": "hello world"
+}

@@ -1,6 +1,5 @@
 import sys
 import os
-import json
 import time
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -9,9 +8,13 @@ sys.path.insert(0, project_root)
 from simulations.loader import load_characters, load_equipment, load_weapons, load_spells, load_rules
 from simulations.dice import roll_dice
 
-def calculate_modifier(score):
-    """Calculates ability modifier from a score."""
-    return (score - 10) // 2
+from .character_engine import (
+    CharacterCreationError,
+    build_character,
+    calculate_modifier,
+    load_reference_data,
+    save_character,
+)
 
 def get_valid_input(prompt, validation_func, error_msg="Invalid input. Please try again."):
     """Helper function to get valid input from user."""
@@ -82,8 +85,7 @@ def choose_starting_equipment(character_class, weapons_data, equipment_data, cla
     Returns a list of equipment names and armor AC value.
     """
     equipment_choices = []
-    armor_ac = 0
-    armor_type = "None"
+    selections = {"weapon": None, "armor": None, "pack": None}
     
     #Find the class data
     class_data = None
@@ -118,6 +120,7 @@ def choose_starting_equipment(character_class, weapons_data, equipment_data, cla
         ))
         chosen_weapon = available_weapons[weapon_choice - 1]
         equipment_choices.append(chosen_weapon["name"])
+        selections["weapon"] = chosen_weapon["name"]
     
     #Armor selection based on armor proficiencies
     armor_proficiencies = class_data.get("armor_proficiencies", [])
@@ -142,8 +145,7 @@ def choose_starting_equipment(character_class, weapons_data, equipment_data, cla
         if armor_choice > 0:
             chosen_armor = available_armor[armor_choice - 1]
             equipment_choices.append(chosen_armor["name"])
-            armor_ac = chosen_armor["ac"]
-            armor_type = chosen_armor["type"]
+            selections["armor"] = chosen_armor["name"]
     
     #Pack selection
     available_packs = equipment_data.get("packs", [])
@@ -166,19 +168,11 @@ def choose_starting_equipment(character_class, weapons_data, equipment_data, cla
             ))
             chosen_pack = suitable_packs[pack_choice - 1]
             equipment_choices.append(chosen_pack["name"])
+            selections["pack"] = chosen_pack["name"]
         else:
             print(f"\nNo suitable adventuring packs found for {character_class}.")
     
-    return equipment_choices, armor_ac, armor_type
-
-def calculate_ac(armor_ac, dex_mod, armor_type=None):
-    """Calculate AC based on armor type and Dexterity modifier."""
-    if armor_type == "Heavy":
-        return armor_ac  #Heavy armor doesn't add Dex modifier
-    elif armor_type == "Medium":
-        return armor_ac + min(2, dex_mod)  #Medium armor max +2 from Dex
-    else:  #Light armor or no armor
-        return armor_ac + dex_mod
+    return equipment_choices, selections
 
 def create_character():
     """Main function to guide through character creation."""
@@ -213,9 +207,9 @@ def create_character():
     )
     
     #Step 4: Choose equipment and spells
-    equipment_list, armor_ac, armor_type = choose_starting_equipment(
-        class_name, weapons, equipment, classes
-    )
+    equipment_list, equipment_selection = choose_starting_equipment(
+        class_name, weapons, equipment, classes␊
+    )␊
 
     spellcasting_classes = ["Wizard", "Sorcerer", "Warlock", "Bard", "Cleric", "Druid", "Paladin", "Ranger"]
 
@@ -423,165 +417,34 @@ def create_character():
         for ability in abilities:
             print(f"{ability.capitalize()}: {temp_abilities[ability]}")
     
-    #Step 6: Calculate derived stats
-    con_mod = calculate_modifier(abilities["constitution"])
-    dex_mod = calculate_modifier(abilities["dexterity"])
-    
-    #Calculate HP (max at first level)
-    hit_die_max = int(chosen_class['hit_die'].replace('d', ''))
-    hp = hit_die_max + con_mod
-    
-    #Calculate AC
-    ac = calculate_ac(armor_ac, dex_mod, armor_type)      
-    
-    #Step 7: Create actions based on equipment and class features
-    actions = []
-
-    proficiency_bonus = 2  #Level 1 characters have +2 Proficiency Bonus      
-
-    for item in equipment_list:
-        for weapon in weapons["weapons"]:
-            if weapon["name"] == item:
-
-                if "Finesse" in weapon.get("properties", []):
-                    #Use higher of STR or DEX
-                    ability_mod = max(calculate_modifier(abilities["strength"]), 
-                                    calculate_modifier(abilities["dexterity"]))
-                elif weapon["weapon_type"] == "Melee":
-                    ability_mod = calculate_modifier(abilities["strength"])
-                else:  #Ranged
-                    ability_mod = calculate_modifier(abilities["dexterity"])
-                
-                attack_bonus = proficiency_bonus + ability_mod
-                damage_bonus = ability_mod
-                
-                actions.append({
-                    "name": weapon["name"],
-                    "type": f"{weapon['weapon_type']} Weapon Attack",
-                    "attack_bonus": attack_bonus,
-                    "damage_dice": weapon["damage"],
-                    "damage_bonus": damage_bonus,
-                    "damage_type": weapon["damage_type"],
-                    "properties": weapon.get("properties", [])
-                })
-                break
-    
-    class_data = None
-    for cls in classes:
-        if cls["class"] == class_name:
-            class_data = cls
-            break
-
-    #Add class features
-    if class_data:
-        features = class_data.get("features", [])
-        for feature in features:
-            if feature["level"] == 1:  #Only add level 1 features
-                action = {
-                    "name": feature["name"],
-                    "type": "Class Feature",
-                    "description": feature["description"]
-                }
-                
-                #Load additional feature details, if any
-                dynamic_properties = [
-                "uses", "recharge", "action_type", "damage_dice", "damage_bonus",
-                "damage_type", "healing_dice", "save_dc", "save_ability", "range",
-                "conditions", "die_size", "spellcasting_ability", "spell_slots",
-                "cantrips_known", "passive"
-                ]
-                
-                for prop in dynamic_properties:
-                    if prop in feature:
-                        action[prop] = feature[prop]
-                
-                #Add attack bonus for features that deal damage and have an associated ability
-                if "damage_dice" in feature and "spellcasting_ability" in feature:
-                    ability_mod = calculate_modifier(abilities[feature["spellcasting_ability"]])
-                    action["attack_bonus"] = proficiency_bonus + ability_mod
-                elif "damage_dice" in feature and class_name in spellcasting_ability:
-                    ability_mod = calculate_modifier(abilities[spellcasting_ability[class_name]])
-                    action["attack_bonus"] = proficiency_bonus + ability_mod
-                
-                actions.append(action)
-
-
-    #Add class-specific actions
-    spellcasting_ability = {
-        "Wizard": "intelligence",
-        "Sorcerer": "charisma", 
-        "Warlock": "charisma",
-        "Bard": "charisma",
-        "Cleric": "wisdom",
-        "Druid": "wisdom",
-        "Paladin": "charisma",
-        "Ranger": "wisdom"
-    }
-
-    if class_name in spellcasting_ability:
-        ability_mod = calculate_modifier(abilities[spellcasting_ability[class_name]])
-        save_dc = 8 + proficiency_bonus + ability_mod
-
-    #Add basic cantrip actions
-    basic_cantrips = {
-        "Wizard": {"name": "Fire Bolt", "damage": "1d10", "type": "Fire"},
-        "Sorcerer": {"name": "Fire Bolt", "damage": "1d10", "type": "Fire"},
-        "Warlock": {"name": "Eldritch Blast", "damage": "1d10", "type": "Force"},
-        "Bard": {"name": "Vicious Mockery", "damage": "1d4", "type": "Psychic"},
-        "Cleric": {"name": "Sacred Flame", "damage": "1d8", "type": "Radiant"},
-        "Druid": {"name": "Produce Flame", "damage": "1d8", "type": "Fire"}
-    }
-    
-    if class_name in basic_cantrips:
-        cantrip = basic_cantrips[class_name]
-        actions.append({
-            "name": cantrip["name"],
-            "type": "Spell Attack",
-            "attack_bonus": proficiency_bonus + ability_mod if class_name != "Cleric" else 0,
-            "damage_dice": cantrip["damage"],
-            "damage_bonus": 0,
-            "damage_type": cantrip["type"],
-            "save_dc": save_dc if class_name == "Cleric" else None,
-            "save_ability": "DEX" if class_name == "Cleric" else None
-        })
-    
-    #Step 8: Create character object
-    character = {
+        payload = {
         "name": character_name,
         "class": class_name,
-        "level": 1,
-        "stats": abilities,
-        "hit_points": hp,
-        "max_hit_points": hp,
-        "armor_class": ac,
+        "ability_scores": abilities,
         "skills": chosen_skills,
-        "equipment": equipment_list,
+        "equipment": equipment_selection,
         "spells": chosen_spells,
-        "actions": actions,
-        "proficiency_bonus": proficiency_bonus
     }
-    
-    #Step 9: Create Directory (if it doesn't exist) and save character
-    player_data_dir = os.path.join(os.path.dirname(__file__), 'player_data')
-    os.makedirs(player_data_dir, exist_ok=True)
 
-    filename = f"{character_name.replace(' ', '_')}.json"
-    filepath = os.path.join(player_data_dir, filename)
-    with open(filepath, 'w') as f:
-        json.dump(character, f, indent=2)
-    
+    try:
+        character = build_character(payload, load_reference_data())
+    except CharacterCreationError as exc:
+        print(f"\nError while finalising character: {exc}")
+        return None
+
+    save_character(character)
+
     print(f"\nCharacter created successfully!")
-    print(f"Name: {character_name}")
-    print(f"Class: {class_name}")
-    print(f"HP: {hp}")
-    print(f"AC: {ac}")
-    print(f"Skills: {', '.join(chosen_skills)}")
-    print(f"Equipment: {', '.join(equipment_list)}")
-    if chosen_spells:
-        print(f"Spells: {', '.join(chosen_spells)}")
-    print(f"Saved to '{filename}'")
-    
-    return character
+    print(f"Name: {character['name']}")
+    print(f"Class: {character['class']}")
+    print(f"HP: {character['max_hit_points']}")
+    print(f"AC: {character['armor_class']}")
+    print(f"Skills: {', '.join(character['skills'])}")
+    print(f"Equipment: {', '.join(character['equipment'])}")
+    if character['spells']:
+        print(f"Spells: {', '.join(character['spells'])}")
+    print(f"Saved to '{character['id']}.json'")
 
+    return character
 if __name__ == "__main__":
     create_character()

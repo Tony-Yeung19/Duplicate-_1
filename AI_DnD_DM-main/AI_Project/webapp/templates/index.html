@@ -26,6 +26,84 @@
         <p id="status-message" class="status"></p>
       </section>
 
+            <section class="creation-panel">
+        <div class="creation-header">
+          <h2>Forged Heroes</h2>
+          <p>Create a new character using the same rules as the simulator.</p>
+        </div>
+        <form id="character-form">
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Name</span>
+              <input id="creator-name" name="name" type="text" placeholder="E.g. Nyssa the Bold" required />
+            </label>
+
+            <label class="form-field">
+              <span>Class</span>
+              <select id="creator-class" name="class" required></select>
+            </label>
+
+            <label class="form-field">
+              <span>Ability Method</span>
+              <div class="ability-controls">
+                <select id="ability-method" name="ability_method"></select>
+                <button type="button" id="roll-abilities" class="secondary">Roll</button>
+              </div>
+            </label>
+
+            <label class="form-field" id="pack-field">
+              <span>Adventuring Pack</span>
+              <select id="pack-select" name="pack"></select>
+            </label>
+
+            <label class="form-field">
+              <span>Weapon</span>
+              <select id="weapon-select" name="weapon"></select>
+            </label>
+
+            <label class="form-field">
+              <span>Armor / Shield</span>
+              <select id="armor-select" name="armor"></select>
+            </label>
+          </div>
+
+          <fieldset id="ability-fieldset">
+            <legend>Ability Scores</legend>
+            <div class="ability-grid" id="ability-inputs"></div>
+          </fieldset>
+
+          <fieldset id="skill-fieldset">
+            <legend>Skills</legend>
+            <p id="skill-hint" class="hint"></p>
+            <div id="skill-options" class="option-grid"></div>
+          </fieldset>
+
+          <fieldset id="spell-fieldset" class="hidden">
+            <legend>Spells</legend>
+            <div class="spell-group">
+              <h3>Cantrips</h3>
+              <p class="hint" id="cantrip-hint"></p>
+              <div id="cantrip-options" class="option-grid"></div>
+            </div>
+            <div class="spell-group">
+              <h3>Level 1 Spells</h3>
+              <p class="hint" id="spell-hint"></p>
+              <div id="spell-options" class="option-grid"></div>
+            </div>
+          </fieldset>
+
+          <label class="form-field">
+            <span>Character Bio (optional)</span>
+            <textarea id="creator-description" name="description" rows="3" placeholder="Describe your hero's tale..."></textarea>
+          </label>
+
+          <div class="form-actions">
+            <button type="submit" id="create-character">Save Character</button>
+            <p id="creation-status" class="status"></p>
+          </div>
+        </form>
+      </section>
+
       <p id="narrator-callout" class="narrator hidden">Choose your champions to begin the tale.</p>
 
       <section id="battlefield" class="hidden">

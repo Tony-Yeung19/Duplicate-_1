@@ -8,7 +8,7 @@ from typing import Dict, List, Optional
 from AI_Project.simulations.loader import load_monsters
 from AI_Project.simulations.simulator import CombatSimulator
 
-from .sample_players import SAMPLE_PLAYERS, clone_player
+from .sample_players import SAMPLE_PLAYERS, all_player_templates, clone_player
 
 
 class GameError(Exception):
@@ -230,11 +230,11 @@ def available_players() -> List[dict]:
         {
             "id": player["id"],
             "name": player["name"],
-            "class": player["class"],
-            "max_hit_points": player["max_hit_points"],
-            "armor_class": player["armor_class"],
+             "class": player.get("class"),
+            "max_hit_points": player.get("max_hit_points", player.get("hit_points", 0)),
+            "armor_class": player.get("armor_class"),
         }
-        for player in SAMPLE_PLAYERS
+        for player in all_player_templates()
     ]
 
 

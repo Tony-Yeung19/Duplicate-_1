@@ -109,7 +109,9 @@ SAMPLE_PLAYERS = [
     },
 ]
 
-
+def all_player_templates():
+    """Return the list of available sample player template names."""
+    return sorted(SAMPLE_PLAYERS.keys())
 def clone_player(player_id):
     """Return a deep copy of the player template matching ``player_id``."""
     for template in SAMPLE_PLAYERS:
@@ -119,3 +121,5 @@ def clone_player(player_id):
             player["type"] = "player"
             return player
     raise KeyError(f"Unknown player id: {player_id}")
+
+__all__ = ["SAMPLE_PLAYERS", "all_player_templates", "clone_player"]

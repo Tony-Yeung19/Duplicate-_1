@@ -98,6 +98,163 @@ main {
   border: 1px solid rgba(212, 163, 115, 0.3);
 }
 
+.creation-panel {
+  background: var(--panel-color);
+  padding: 1.75rem;
+  border-radius: 18px;
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(212, 163, 115, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.creation-header h2 {
+  margin: 0;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.creation-header p {
+  margin: 0.35rem 0 0;
+  color: var(--muted-text);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-field span,
+fieldset legend {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+}
+
+input,
+textarea {
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(212, 163, 115, 0.4);
+  background: rgba(42, 24, 17, 0.95);
+  color: var(--text-color);
+  font-size: 1rem;
+  font-family: 'Crimson Text', serif;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+textarea {
+  resize: vertical;
+}
+
+.ability-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+button.secondary {
+  background: transparent;
+  border-color: rgba(212, 163, 115, 0.5);
+  color: var(--muted-text);
+  box-shadow: none;
+}
+
+button.secondary:hover {
+  transform: none;
+  box-shadow: 0 0 0 2px rgba(197, 48, 48, 0.25);
+}
+
+fieldset {
+  border: 1px solid rgba(212, 163, 115, 0.25);
+  border-radius: 14px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.ability-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(212, 163, 115, 0.2);
+}
+
+.ability-input label {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Cinzel', serif;
+}
+
+.option-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.5rem;
+}
+
+.option-grid label {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 0.6rem 0.7rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+}
+
+.option-grid input[type="checkbox"]:disabled + span {
+  opacity: 0.5;
+}
+
+.option-grid input[type="checkbox"] {
+  accent-color: var(--accent-color);
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted-text);
+}
+
+.spell-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.spell-group h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  font-family: 'Cinzel', serif;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .selector {
   display: flex;
   flex-direction: column;

@@ -3,6 +3,15 @@ from __future__ import annotations
 
 from flask import Flask, jsonify, render_template, request
 
+from AI_Project.player.character_engine import (
+    CharacterCreationError,
+    build_character,
+    character_options,
+    load_saved_characters,
+    roll_ability_scores,
+    save_character,
+)
+
 from .game_manager import (
     GameError,
     available_monsters,
@@ -28,7 +37,55 @@ def get_players():
 def get_monsters():
     return jsonify({"monsters": available_monsters()})
 
+@app.get("/api/character-options")
+def get_character_options():
+    return jsonify(character_options())
 
+
+@app.get("/api/characters")
+def get_custom_characters():
+    characters = [
+        {
+            "id": char["id"],
+            "name": char["name"],
+            "class": char.get("class"),
+            "max_hit_points": char.get("max_hit_points", char.get("hit_points", 0)),
+            "armor_class": char.get("armor_class"),
+        }
+        for char in load_saved_characters()
+    ]
+    return jsonify({"characters": characters})
+
+
+@app.post("/api/character-abilities")
+def post_character_abilities():
+    data = request.get_json(force=True)
+    method = data.get("method")
+    if not method:
+        return jsonify({"error": "method is required"}), 400
+    try:
+        scores = roll_ability_scores(method)
+    except CharacterCreationError as exc:
+        return jsonify({"error": str(exc)}), 400
+    return jsonify({"method": method, "scores": scores})
+
+
+@app.post("/api/characters")
+def create_character_endpoint():
+    payload = request.get_json(force=True)
+    try:
+        character = build_character(payload)
+        character = save_character(character)
+    except CharacterCreationError as exc:
+        return jsonify({"error": str(exc)}), 400
+    summary = {
+        "id": character["id"],
+        "name": character["name"],
+        "class": character.get("class"),
+        "max_hit_points": character.get("max_hit_points", character.get("hit_points", 0)),
+        "armor_class": character.get("armor_class"),
+    }
+    return jsonify({"character": summary})
 @app.post("/api/start-game")
 def start_game():
     data = request.get_json(force=True)
