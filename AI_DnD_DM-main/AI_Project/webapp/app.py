@@ -124,12 +124,14 @@ def player_action():
         return jsonify({"error": "Game not found"}), 404
 
     try:
-        session.player_action(action_name)
+         result = session.player_action(action_name) or {}
     except GameError as exc:
         return jsonify({"error": str(exc)}), 400
 
-    return jsonify({"game": session.serialize()})
-
+    response = {"game": session.serialize()}
+    if result.get("events"):
+        response["events"] = result["events"]
+    return jsonify(response)
 
 @app.get("/api/reset")
 def reset_games():

@@ -38,6 +38,8 @@ def _prepare_monster_templates() -> Dict[str, dict]:
                         "damage_dice": action.get("damage_dice", "1d6"),
                         "damage_bonus": action.get("damage_bonus", 0),
                         "damage_type": action.get("damage_type", ""),
+                        "attack_roll_bonus_dice": action.get("attack_roll_bonus_dice"),
+                        "extra_damage_dice": action.get("extra_damage_dice"),
                     }
                 )
         if not actions or not isinstance(hit_points, int) or not isinstance(armor_class, int):
@@ -120,7 +122,7 @@ class GameSession:
                 return
         self.turn_index = previous_index
 
-    def _autoplay_until_player_turn(self) -> None:
+    def _autoplay_until_player_turn(self, events: Optional[List[dict]] = None) -> None:
         while not self.winner:
             current = self.initiative_order[self.turn_index]
             if current.get("current_hit_points", 0) <= 0:
@@ -128,28 +130,71 @@ class GameSession:
                 continue
             if current.get("type") != "monster":
                 break
-            self._execute_monster_turn(current)
+            monster_event = self._execute_monster_turn(current)
+            if events is not None and monster_event is not None:
+                events.append(monster_event)
             if self.winner:
                 break
             self._advance_turn()
 
-    def _execute_monster_turn(self, monster: dict) -> None:
+    def _execute_monster_turn(self, monster: dict) -> Optional[dict]:
         target = self._first_living(self.players)
         if target is None:
             self.winner = "monsters"
-            self.log.append("All heroes have fallen!")
-            return
+            message = "All heroes have fallen!"
+            self.log.append(message)
+            return {
+                "actor": monster["name"],
+                "type": "monster",
+                "target": None,
+                "hit": False,
+                "critical": False,
+                "damage": 0,
+                "message": message,
+                "target_remaining_hp": None,
+                "target_defeated": True,
+                "extra_messages": [message],
+            }
         action = next((act for act in monster.get("actions", []) if act.get("name")), None)
         if action is None:
-            self.log.append(f"{monster['name']} hesitates, unsure of what to do.")
-            return
+            message = f"{monster['name']} hesitates, unsure of what to do."
+            self.log.append(message)
+            return {
+                "actor": monster["name"],
+                "type": "monster",
+                "target": target["name"],
+                "hit": False,
+                "critical": False,
+                "damage": 0,
+                "message": message,
+                "target_remaining_hp": target.get("current_hit_points"),
+                "target_defeated": False,
+            }
         result = self.simulator.resolve_attack(monster, action["name"], target)
         self.log.append(result["message"])
+        event: dict = {
+            "actor": monster["name"],
+            "type": "monster",
+            "target": target["name"],
+            "hit": result.get("hit", False),
+            "critical": result.get("critical", False),
+            "damage": result.get("damage", 0),
+            "message": result.get("message"),
+            "target_remaining_hp": target.get("current_hit_points"),
+            "target_defeated": False,
+        }
         if target["current_hit_points"] <= 0:
-            self.log.append(f"{target['name']} has fallen!")
+            defeat_message = f"{target['name']} has fallen!"
+            self.log.append(defeat_message)
+            event["target_defeated"] = True
+            event.setdefault("extra_messages", []).append(defeat_message)
             if not self._first_living(self.players):
                 self.winner = "monsters"
-
+                victory_message = "All heroes have fallen!"
+                self.log.append(victory_message)
+                event.setdefault("extra_messages", []).append(victory_message)
+        return event
+    
     def _first_living(self, combatants: List[dict]) -> Optional[dict]:
         for combatant in combatants:
             if combatant.get("current_hit_points", 0) > 0:
@@ -160,9 +205,10 @@ class GameSession:
     def current_turn(self) -> dict:
         return self.initiative_order[self.turn_index]
 
-    def player_action(self, action_name: str) -> None:
+    def player_action(self, action_name: str) -> dict:
+        events: List[dict] = []
         if self.winner:
-            return
+            return {"events": events}
         current = self.current_turn
         if current.get("type") != "player":
             raise GameError("It is not the player's turn.")
@@ -172,16 +218,50 @@ class GameSession:
         target = self._first_living(self.monsters)
         if target is None:
             self.winner = "players"
-            return
+            message = "All foes lie defeated."
+            self.log.append(message)
+            events.append(
+                {
+                    "actor": current["name"],
+                    "type": "player",
+                    "target": None,
+                    "hit": False,
+                    "critical": False,
+                    "damage": 0,
+                    "message": message,
+                    "target_remaining_hp": None,
+                    "target_defeated": True,
+                }
+            )
+            return {"events": events}
         result = self.simulator.resolve_attack(current, action_name, target)
         self.log.append(result["message"])
+        event: dict = {
+            "actor": current["name"],
+            "type": "player",
+            "target": target["name"],
+            "hit": result.get("hit", False),
+            "critical": result.get("critical", False),
+            "damage": result.get("damage", 0),
+            "message": result.get("message"),
+            "target_remaining_hp": target.get("current_hit_points"),
+            "target_defeated": False,
+        }
         if target["current_hit_points"] <= 0:
-            self.log.append(f"{target['name']} is defeated!")
+            defeat_message = f"{target['name']} is defeated!"
+            self.log.append(defeat_message)
+            event["target_defeated"] = True
+            event.setdefault("extra_messages", []).append(defeat_message)
             if not self._first_living(self.monsters):
                 self.winner = "players"
+                victory_message = "The heroes stand victorious!"
+                self.log.append(victory_message)
+                event.setdefault("extra_messages", []).append(victory_message)
+        events.append(event)
         if not self.winner:
             self._advance_turn()
-            self._autoplay_until_player_turn()
+            self._autoplay_until_player_turn(events)
+        return {"events": events}
 
     def serialize(self) -> dict:
         def serialize_combatant(combatant: dict) -> dict:
@@ -203,7 +283,9 @@ class GameSession:
                         "attack_bonus": action.get("attack_bonus", 0),
                         "damage_dice": action.get("damage_dice", "1d6"),
                         "damage_bonus": action.get("damage_bonus", 0),
-                        "damage_type": action.get("damage_type", ""),
+                        "damage_type": action.get("damage_type", ""),                       
+                        "attack_roll_bonus_dice": action.get("attack_roll_bonus_dice"),
+                        "extra_damage_dice": action.get("extra_damage_dice"),
                         "description": action.get("description", ""),
                     }
                     for action in combatant.get("actions", [])

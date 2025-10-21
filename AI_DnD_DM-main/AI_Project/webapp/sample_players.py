@@ -35,6 +35,7 @@ SAMPLE_PLAYERS = [
                 "damage_dice": "1d8",
                 "damage_bonus": 5,
                 "damage_type": "slashing",
+                "attack_roll_bonus_dice": "1d8",
                 "description": "Expends a superiority die to drive the blade home with deadly focus.",
             },
         ],

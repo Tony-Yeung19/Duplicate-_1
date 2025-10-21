@@ -581,10 +581,20 @@ function renderAbilityScores(container, stats = {}) {
 }
 
 function buildActionTooltip(action) {
-  const parts = [
-    `${action.damage_dice}${action.damage_bonus ? `+${action.damage_bonus}` : ''} ${action.damage_type || 'damage'}`.trim(),
-    action.description,
-  ].filter(Boolean);
+  const parts = [];
+  if (action.attack_roll_bonus_dice) {
+    parts.push(`Adds ${action.attack_roll_bonus_dice} to the attack roll.`);
+  }
+  const damageSummary = `${action.damage_dice}${action.damage_bonus ? `+${action.damage_bonus}` : ''} ${action.damage_type || 'damage'}`.trim();
+  if (damageSummary) {
+    parts.push(damageSummary);
+  }
+  if (action.extra_damage_dice) {
+    parts.push(`Bonus damage: ${action.extra_damage_dice}`);
+  }
+  if (action.description) {
+    parts.push(action.description);
+  }
   return parts.join('\n');
 }
 
