@@ -1,0 +1,59 @@
+{
+  "id": "tony-2",
+  "name": "Tony",
+  "class": "Barbarian",
+  "level": 1,
+  "type": "player",
+  "stats": {
+    "strength": 17,
+    "dexterity": 14,
+    "constitution": 13,
+    "intelligence": 13,
+    "wisdom": 12,
+    "charisma": 11
+  },
+  "skills": [
+    "Animal Handling",
+    "Survival"
+  ],
+  "equipment": [
+    "Quarterstaff",
+    "Padded Armor",
+    "Explorer's Pack"
+  ],
+  "spells": [],
+  "actions": [
+    {
+      "name": "Quarterstaff",
+      "type": "Melee Weapon Attack",
+      "attack_bonus": 5,
+      "damage_dice": "1d6",
+      "damage_bonus": 3,
+      "damage_type": "Bludgeoning",
+      "properties": [
+        "Versatile (1d8)"
+      ],
+      "description": "Versatile (1d8)"
+    },
+    {
+      "name": "Rage",
+      "type": "Class Feature",
+      "description": "Enter a rage as a Bonus Action. Gain advantage on Strength checks and saves, +2 damage with melee weapons, and resistance to bludgeoning, piercing, and slashing damage.",
+      "uses": 2,
+      "recharge": "long rest",
+      "action_type": "bonus"
+    },
+    {
+      "name": "Unarmored Defense",
+      "type": "Passive Feature",
+      "description": "While not wearing armor, AC = 10 + DEX modifier + CON modifier.",
+      "passive": true
+    }
+  ],
+  "proficiency_bonus": 2,
+  "max_hit_points": 13,
+  "hit_points": 13,
+  "current_hit_points": 13,
+  "armor_class": 13,
+  "description": "A newly forged Barbarian ready for adventure."
+}

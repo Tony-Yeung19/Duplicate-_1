@@ -1,6 +1,8 @@
 """Sample playable characters for the web UI."""
 from copy import deepcopy
 
+from AI_Project.player.character_engine import load_character, load_saved_characters
+
 SAMPLE_PLAYERS = [
     {
         "id": "fighter-aria",
@@ -110,16 +112,34 @@ SAMPLE_PLAYERS = [
 ]
 
 def all_player_templates():
-    """Return the list of available sample player template names."""
-    return sorted(SAMPLE_PLAYERS.keys())
+    """Return the list of available player templates including custom saves."""
+
+    templates = list(SAMPLE_PLAYERS)
+    templates.extend(load_saved_characters())
+    return templates
+
+
 def clone_player(player_id):
     """Return a deep copy of the player template matching ``player_id``."""
+
     for template in SAMPLE_PLAYERS:
         if template["id"] == player_id:
             player = deepcopy(template)
             player["current_hit_points"] = player["max_hit_points"]
             player["type"] = "player"
             return player
-    raise KeyError(f"Unknown player id: {player_id}")
+
+    try:
+        player = load_character(player_id)
+    except FileNotFoundError as exc:
+        raise KeyError(f"Unknown player id: {player_id}") from exc
+
+    player = dict(player)
+    max_hp = player.get("max_hit_points") or player.get("hit_points")
+    player["max_hit_points"] = max_hp
+    player["current_hit_points"] = max_hp
+    player["type"] = "player"
+    return player
+
 
 __all__ = ["SAMPLE_PLAYERS", "all_player_templates", "clone_player"]

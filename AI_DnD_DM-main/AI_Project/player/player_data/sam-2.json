@@ -1,0 +1,74 @@
+{
+  "id": "sam-2",
+  "name": "Sam",
+  "class": "Druid",
+  "level": 1,
+  "type": "player",
+  "stats": {
+    "strength": 11,
+    "dexterity": 10,
+    "constitution": 9,
+    "intelligence": 9,
+    "wisdom": 8,
+    "charisma": 6
+  },
+  "skills": [
+    "Animal Handling",
+    "Medicine"
+  ],
+  "equipment": [
+    "Javelin",
+    "Padded Armor",
+    "Dungeoneer's Pack"
+  ],
+  "spells": [
+    "Guidance",
+    "Cure Wounds"
+  ],
+  "actions": [
+    {
+      "name": "Javelin",
+      "type": "Melee Weapon Attack",
+      "attack_bonus": 2,
+      "damage_dice": "1d6",
+      "damage_bonus": 0,
+      "damage_type": "Piercing",
+      "properties": [
+        "Thrown (range 30/120)"
+      ],
+      "description": "Thrown (range 30/120)"
+    },
+    {
+      "name": "Produce Flame",
+      "type": "Spell Attack",
+      "attack_bonus": 1,
+      "damage_dice": "1d8",
+      "damage_bonus": 0,
+      "damage_type": "Fire",
+      "save_dc": null,
+      "save_ability": null
+    },
+    {
+      "name": "Spellcasting",
+      "type": "Spellcasting",
+      "description": "You are a full spellcaster using the Druid spell list. Your spellcasting ability is Wisdom.",
+      "spellcasting_ability": "wisdom",
+      "spell_slots": [
+        2
+      ],
+      "cantrips_known": 2
+    },
+    {
+      "name": "Primal Order",
+      "type": "Class Feature",
+      "description": "Choose Magician (gain an extra cantrip and a bonus to Arcana/Nature checks) or Warden (gain Martial weapons and Medium armor).",
+      "passive": true
+    }
+  ],
+  "proficiency_bonus": 2,
+  "max_hit_points": 7,
+  "hit_points": 7,
+  "current_hit_points": 7,
+  "armor_class": 11,
+  "description": "A newly forged Druid ready for adventure."
+}
