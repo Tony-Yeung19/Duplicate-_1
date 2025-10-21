@@ -196,6 +196,7 @@ class GameSession:
                 "armor_class": combatant.get("armor_class"),
                 "initiative_bonus": combatant.get("initiative_bonus", 0),
                 "description": combatant.get("description", ""),
+                "stats": combatant.get("stats", {}),
                 "actions": [
                     {
                         "name": action["name"],
@@ -203,6 +204,7 @@ class GameSession:
                         "damage_dice": action.get("damage_dice", "1d6"),
                         "damage_bonus": action.get("damage_bonus", 0),
                         "damage_type": action.get("damage_type", ""),
+                        "description": action.get("description", ""),
                     }
                     for action in combatant.get("actions", [])
                 ],

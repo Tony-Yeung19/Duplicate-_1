@@ -9,8 +9,18 @@ const playerActions = document.getElementById('player-actions');
 const logList = document.getElementById('log-list');
 const roundNumber = document.getElementById('round-number');
 const activeTurn = document.getElementById('active-turn');
+const narrator = document.getElementById('narrator-callout');
 
 let currentGameId = null;
+
+const ABILITY_LABELS = {
+  strength: 'STR',
+  dexterity: 'DEX',
+  constitution: 'CON',
+  intelligence: 'INT',
+  wisdom: 'WIS',
+  charisma: 'CHA',
+};
 
 async function loadOptions() {
   try {
@@ -26,7 +36,11 @@ async function loadOptions() {
     populateSelect(monsterSelect, monstersData.monsters, 'Select a monster');
   } catch (error) {
     console.error('Failed to load options', error);
-    setStatus('Unable to load heroes or monsters. Please refresh the page.', true);
+    setStatus('The Weave falters—unable to load heroes or monsters. Try refreshing.', true);
+    if (narrator) {
+      narrator.classList.remove('hidden');
+      narrator.textContent = 'The Dungeon Master cannot find the minis—refresh to search again.';
+    }
   }
 }
 
@@ -70,6 +84,10 @@ function updateCard(card, data) {
   if (description) {
     description.textContent = data.description || '';
   }
+  const statsField = card.querySelector('[data-field="stats"]');
+  if (statsField) {
+    renderAbilityScores(statsField, data.stats);
+  }
 }
 
 function renderLog(logEntries, winner) {
@@ -98,9 +116,52 @@ function renderActions(player, turn, winner) {
     const button = document.createElement('button');
     button.textContent = `${action.name} (+${action.attack_bonus} | ${action.damage_dice}${action.damage_bonus ? `+${action.damage_bonus}` : ''})`;
     button.disabled = !isPlayersTurn || Boolean(winner);
+    button.title = buildActionTooltip(action);
     button.addEventListener('click', () => executeAction(action.name));
     playerActions.appendChild(button);
   });
+}
+
+function abilityModifier(score) {
+  if (typeof score !== 'number') {
+    return 0;
+  }
+  return Math.floor((score - 10) / 2);
+}
+
+function renderAbilityScores(container, stats = {}) {
+  container.innerHTML = '';
+  const rows = Object.entries(ABILITY_LABELS).map(([key, label]) => {
+    const score = stats[key];
+    if (score == null) {
+      return null;
+    }
+    const mod = abilityModifier(score);
+    const row = document.createElement('div');
+    row.className = 'ability-score';
+    row.innerHTML = `
+      <span class="ability-label">${label}</span>
+      <span class="ability-value">${score}</span>
+      <span class="ability-mod">${mod >= 0 ? `+${mod}` : mod}</span>
+    `;
+    return row;
+  }).filter(Boolean);
+
+  if (!rows.length) {
+    container.classList.add('hidden');
+    return;
+  }
+
+  container.classList.remove('hidden');
+  rows.forEach((row) => container.appendChild(row));
+}
+
+function buildActionTooltip(action) {
+  const parts = [
+    `${action.damage_dice}${action.damage_bonus ? `+${action.damage_bonus}` : ''} ${action.damage_type || 'damage'}`.trim(),
+    action.description,
+  ].filter(Boolean);
+  return parts.join('\n');
 }
 
 function renderGame(game) {
@@ -109,6 +170,9 @@ function renderGame(game) {
   }
 
   battlefield.classList.remove('hidden');
+  if (narrator) {
+    narrator.classList.remove('hidden');
+  }
   const hero = game.players[0];
   const foe = game.monsters[0];
   updateCard(playerCard, hero);
@@ -120,12 +184,25 @@ function renderGame(game) {
 
   if (game.winner) {
     const victoryMessage = game.winner === 'players'
-      ? 'Victory! The heroes stand triumphant.'
-      : 'Defeat... the monsters claim the day.';
+      ? 'Victory! The adventuring party has triumphed.'
+      : 'Defeat... the dungeon grows ever darker.';
     setStatus(victoryMessage, game.winner !== 'players');
+    if (narrator) {
+      narrator.textContent = game.winner === 'players'
+        ? 'The Dungeon Master records a glorious tale of heroism.'
+        : 'The Dungeon Master mourns the fallen and closes the tome.';
+    }
   } else if (game.turn) {
     const isPlayer = game.turn.type === 'player';
-    setStatus(isPlayer ? 'It\'s your turn!' : `${game.turn.name} prepares to strike...`);
+    const turnMessage = isPlayer
+      ? 'Your initiative is called! Choose your maneuver.'
+      : `${game.turn.name} seizes the initiative...`;
+    setStatus(turnMessage);
+    if (narrator) {
+      narrator.textContent = isPlayer
+        ? 'Select a tactic befitting a hero of the realms.'
+        : 'Hold fast—steel yourself for the coming blow.';
+    }
   }
 }
 
@@ -147,6 +224,10 @@ async function executeAction(actionName) {
   } catch (error) {
     console.error('Action error', error);
     setStatus(error.message, true);
+    if (narrator) {
+      narrator.classList.remove('hidden');
+      narrator.textContent = 'The Dungeon Master pauses, sensing that fate resists that move.';
+    }
   }
 }
 
@@ -154,12 +235,16 @@ startButton.addEventListener('click', async () => {
   const playerId = playerSelect.value;
   const monsterId = monsterSelect.value;
   if (!playerId || !monsterId) {
-    setStatus('Choose both a hero and a monster to begin.', true);
+    setStatus('Select both a hero and a foe to tempt fate.', true);
     return;
   }
 
   startButton.disabled = true;
-  setStatus('Preparing the battlefield...');
+  setStatus('The Dungeon Master arranges the battle map...');
+  if (narrator) {
+    narrator.classList.remove('hidden');
+    narrator.textContent = 'Miniatures are placed upon the battle map as the Dungeon Master intones the scene.';
+  }
 
   try {
     const response = await fetch('/api/start-game', {
@@ -172,11 +257,15 @@ startButton.addEventListener('click', async () => {
       throw new Error(data.error || 'Failed to start game');
     }
     currentGameId = data.game.id;
-    setStatus('Encounter started!');
+    setStatus('Initiative rolled! The encounter begins.');
     renderGame(data.game);
   } catch (error) {
     console.error('Start game error', error);
     setStatus(error.message, true);
+    if (narrator) {
+      narrator.classList.remove('hidden');
+      narrator.textContent = 'The Dungeon Master slams the rulebook shut—try once more.';
+    }
   } finally {
     startButton.disabled = false;
   }
