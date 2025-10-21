@@ -1,6 +1,8 @@
 """Sample playable characters for the web UI."""
 from copy import deepcopy
 
+from .character_manager import load_custom_character
+
 SAMPLE_PLAYERS = [
     {
         "id": "fighter-aria",
@@ -118,4 +120,13 @@ def clone_player(player_id):
             player["current_hit_points"] = player["max_hit_points"]
             player["type"] = "player"
             return player
-    raise KeyError(f"Unknown player id: {player_id}")
+    try:
+        saved = load_custom_character(player_id)
+    except (FileNotFoundError, OSError, ValueError):
+        raise KeyError(f"Unknown player id: {player_id}") from None
+
+    player = deepcopy(saved)
+    player.setdefault("type", "player")
+    if "current_hit_points" not in player and "max_hit_points" in player:
+        player["current_hit_points"] = player["max_hit_points"]
+    return player

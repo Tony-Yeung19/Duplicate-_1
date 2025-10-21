@@ -8,6 +8,7 @@ from typing import Dict, List, Optional
 from AI_Project.simulations.loader import load_monsters
 from AI_Project.simulations.simulator import CombatSimulator
 
+from .character_manager import list_custom_characters
 from .sample_players import SAMPLE_PLAYERS, clone_player
 
 
@@ -226,16 +227,31 @@ class GameSession:
 
 
 def available_players() -> List[dict]:
-    return [
+    players: List[dict] = [
         {
             "id": player["id"],
             "name": player["name"],
             "class": player["class"],
             "max_hit_points": player["max_hit_points"],
             "armor_class": player["armor_class"],
+            "type": "sample",
         }
         for player in SAMPLE_PLAYERS
     ]
+
+    for player in list_custom_characters():
+        players.append(
+            {
+                "id": player.get("id"),
+                "name": player.get("name"),
+                "class": player.get("class"),
+                "max_hit_points": player.get("max_hit_points"),
+                "armor_class": player.get("armor_class"),
+                "type": "custom",
+            }
+        )
+
+    return players
 
 
 def available_monsters(limit: int = 25) -> List[dict]:

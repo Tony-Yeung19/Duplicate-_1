@@ -13,6 +13,95 @@
     </header>
 
     <main>
+      <section class="creation-panel">
+        <h2>Forge a Custom Hero</h2>
+        <form id="character-form">
+          <div class="form-row">
+            <label for="character-name">Hero Name
+              <input id="character-name" type="text" placeholder="Arannis the Bold" required />
+            </label>
+            <label for="character-class">Class
+              <select id="character-class" required></select>
+            </label>
+            <label for="ability-method">Ability Method
+              <select id="ability-method">
+                <option value="4d6-drop-lowest">4d6 Drop Lowest</option>
+                <option value="3d6">3d6 Classic</option>
+                <option value="2d6+6">2d6 + 6 Heroic</option>
+                <option value="point-buy">Point Buy</option>
+              </select>
+            </label>
+            <button type="button" id="roll-ability-scores" class="secondary">Generate Scores</button>
+          </div>
+
+          <div class="ability-grid">
+            <label for="ability-strength">Strength
+              <input id="ability-strength" type="number" min="3" max="20" value="15" />
+            </label>
+            <label for="ability-dexterity">Dexterity
+              <input id="ability-dexterity" type="number" min="3" max="20" value="14" />
+            </label>
+            <label for="ability-constitution">Constitution
+              <input id="ability-constitution" type="number" min="3" max="20" value="13" />
+            </label>
+            <label for="ability-intelligence">Intelligence
+              <input id="ability-intelligence" type="number" min="3" max="20" value="12" />
+            </label>
+            <label for="ability-wisdom">Wisdom
+              <input id="ability-wisdom" type="number" min="3" max="20" value="10" />
+            </label>
+            <label for="ability-charisma">Charisma
+              <input id="ability-charisma" type="number" min="3" max="20" value="8" />
+            </label>
+          </div>
+
+          <div class="skills-container">
+            <div class="skills-header">
+              <h3>Skills</h3>
+              <span>Choose <span id="skill-limit">0</span></span>
+            </div>
+            <div id="skill-options" class="option-grid"></div>
+          </div>
+
+          <div class="equipment-container">
+            <h3>Starting Equipment</h3>
+            <div class="equipment-selectors">
+              <label for="weapon-choice">Weapon
+                <select id="weapon-choice"></select>
+              </label>
+              <label for="armor-choice">Armor
+                <select id="armor-choice"></select>
+              </label>
+              <label for="pack-choice">Pack
+                <select id="pack-choice"></select>
+              </label>
+            </div>
+          </div>
+
+          <div id="spell-container" class="spell-container hidden">
+            <h3>Spell Preparation</h3>
+            <p id="spell-helper" class="muted-note"></p>
+            <div>
+              <h4>Cantrips</h4>
+              <div id="cantrip-options" class="option-grid"></div>
+            </div>
+            <div>
+              <h4>1st-Level Spells</h4>
+              <div id="spell-options" class="option-grid"></div>
+            </div>
+          </div>
+
+          <label for="character-description" class="description-field">Background Tale
+            <textarea id="character-description" rows="2" placeholder="A few words about your adventurer..."></textarea>
+          </label>
+
+          <div class="form-actions">
+            <button type="submit">Save Hero</button>
+            <p id="creation-status" class="status"></p>
+          </div>
+        </form>
+      </section>
+
       <section class="selection-panel">
         <div class="selector">
           <label for="player-select">Select your hero</label>
