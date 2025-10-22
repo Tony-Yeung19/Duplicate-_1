@@ -18,7 +18,8 @@ class GameError(Exception):
 class UnknownMonster(GameError):
     """Raised when the requested monster id cannot be located."""
 
-
+class InvalidDiceRequest(GameError):
+    """Raised when dice mechanics are requested with invalid parameters."""
 def _sanitize_monster_name(name: str) -> str:
     return name.lower().replace(" ", "-")
 
@@ -29,6 +30,15 @@ def _prepare_monster_templates() -> Dict[str, dict]:
         hit_points = monster.get("hit_points")
         armor_class = monster.get("armor_class")
         actions = []
+        ability_scores = monster.get("abilities", {}) or {}
+        stats = {
+            "strength": ability_scores.get("STR") or ability_scores.get("strength"),
+            "dexterity": ability_scores.get("DEX") or ability_scores.get("dexterity"),
+            "constitution": ability_scores.get("CON") or ability_scores.get("constitution"),
+            "intelligence": ability_scores.get("INT") or ability_scores.get("intelligence"),
+            "wisdom": ability_scores.get("WIS") or ability_scores.get("wisdom"),
+            "charisma": ability_scores.get("CHA") or ability_scores.get("charisma"),
+        }
         for action in monster.get("actions", []):
             if "attack_bonus" in action and "damage_dice" in action:
                 actions.append(
@@ -56,6 +66,7 @@ def _prepare_monster_templates() -> Dict[str, dict]:
             "initiative_bonus": monster.get("dexterity", 0),
             "actions": actions,
             "description": monster.get("description", ""),
+            "stats": {k: v for k, v in stats.items() if v is not None},
         }
     return monsters
 
@@ -262,7 +273,53 @@ class GameSession:
             self._advance_turn()
             self._autoplay_until_player_turn(events)
         return {"events": events}
+    def _combatant_for_roll(self, candidates: List[dict]) -> dict:
+        living = self._first_living(candidates)
+        if living is not None:
+            return living
+        if candidates:
+            return candidates[0]
+        raise InvalidDiceRequest("No combatants available for this roll.")
 
+    def perform_rule_based_roll(
+        self,
+        *,
+        roller: str,
+        ability: str,
+        proficiency: bool = False,
+        advantage: str = "normal",
+        dc: Optional[int] = None,
+    ) -> dict:
+        if not ability:
+            raise InvalidDiceRequest("An ability must be specified for dice rolls.")
+
+        if dc is not None and dc < 0:
+            raise InvalidDiceRequest("DC must be a positive integer.")
+
+        ability_key = ability.lower()
+
+        if roller == "player":
+            combatant = self._combatant_for_roll(self.players)
+        elif roller == "monster":
+            combatant = self._combatant_for_roll(self.monsters)
+        else:
+            raise InvalidDiceRequest("roller must be either 'player' or 'monster'.")
+
+        try:
+            result = self.simulator.roll_d20_test(
+                combatant,
+                ability_key,
+                proficiency=proficiency,
+                dc=dc,
+                advantage_state=advantage,
+            )
+        except ValueError as exc:
+            raise InvalidDiceRequest(str(exc)) from exc
+
+        self.log.append(result["message"])
+        result["roller"] = combatant.get("name")
+        result["roller_type"] = combatant.get("type", roller)
+        return result
     def serialize(self) -> dict:
         def serialize_combatant(combatant: dict) -> dict:
             max_hp = combatant.get("max_hit_points") or combatant.get("hit_points")
@@ -277,19 +334,7 @@ class GameSession:
                 "initiative_bonus": combatant.get("initiative_bonus", 0),
                 "description": combatant.get("description", ""),
                 "stats": combatant.get("stats", {}),
-                "actions": [
-                    {
-                        "name": action["name"],
-                        "attack_bonus": action.get("attack_bonus", 0),
-                        "damage_dice": action.get("damage_dice", "1d6"),
-                        "damage_bonus": action.get("damage_bonus", 0),
-                        "damage_type": action.get("damage_type", ""),                       
-                        "attack_roll_bonus_dice": action.get("attack_roll_bonus_dice"),
-                        "extra_damage_dice": action.get("extra_damage_dice"),
-                        "description": action.get("description", ""),
-                    }
-                    for action in combatant.get("actions", [])
-                ],
+                "actions": self.simulator.describe_actions(combatant),
             }
 
         current = self.current_turn if not self.winner else None
@@ -303,6 +348,7 @@ class GameSession:
             "turn": {
                 "name": current["name"],
                 "type": current.get("type", "unknown"),
+                "actions": self.simulator.describe_actions(current),
             } if current else None,
         }
 

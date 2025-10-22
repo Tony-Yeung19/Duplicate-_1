@@ -125,6 +125,37 @@
               <h3>Battle Maneuvers</h3>
               <div id="player-actions" class="action-buttons"></div>
             </div>
+                        <div class="dice-panel">
+              <h3>Heroic Dice</h3>
+              <form id="hero-dice-form" class="dice-form">
+                <div class="dice-row">
+                  <label>
+                    <span>Ability</span>
+                    <select id="hero-dice-ability" disabled></select>
+                  </label>
+                  <label>
+                    <span>Advantage</span>
+                    <select id="hero-dice-advantage" disabled>
+                      <option value="normal" selected>Normal</option>
+                      <option value="advantage">Advantage</option>
+                      <option value="disadvantage">Disadvantage</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="dice-row">
+                  <label>
+                    <span>DC (optional)</span>
+                    <input id="hero-dice-dc" type="number" min="1" placeholder="e.g. 15" disabled />
+                  </label>
+                  <label class="dice-toggle">
+                    <input id="hero-dice-proficiency" type="checkbox" disabled />
+                    <span>Add proficiency (+2)</span>
+                  </label>
+                </div>
+                <button type="submit" disabled>Roll Test</button>
+              </form>
+              <p id="hero-dice-result" class="dice-result"></p>
+            </div>
           </article>
 
           <article class="card" id="monster-card">
@@ -139,6 +170,37 @@
             </div>
             <div class="ability-scores" data-field="stats"></div>
             <p class="description" data-field="description"></p>
+                        <div class="dice-panel">
+              <h3>Monster Dice</h3>
+              <form id="monster-dice-form" class="dice-form">
+                <div class="dice-row">
+                  <label>
+                    <span>Ability</span>
+                    <select id="monster-dice-ability" disabled></select>
+                  </label>
+                  <label>
+                    <span>Advantage</span>
+                    <select id="monster-dice-advantage" disabled>
+                      <option value="normal" selected>Normal</option>
+                      <option value="advantage">Advantage</option>
+                      <option value="disadvantage">Disadvantage</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="dice-row">
+                  <label>
+                    <span>DC (optional)</span>
+                    <input id="monster-dice-dc" type="number" min="1" placeholder="e.g. 13" disabled />
+                  </label>
+                  <label class="dice-toggle">
+                    <input id="monster-dice-proficiency" type="checkbox" disabled />
+                    <span>Add proficiency (+2)</span>
+                  </label>
+                </div>
+                <button type="submit" disabled>Roll Test</button>
+              </form>
+              <p id="monster-dice-result" class="dice-result"></p>
+            </div>
           </article>
         </div>
 

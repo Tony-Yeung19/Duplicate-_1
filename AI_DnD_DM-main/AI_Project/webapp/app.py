@@ -14,6 +14,7 @@ from AI_Project.player.character_engine import (
 
 from .game_manager import (
     GameError,
+    InvalidDiceRequest,
     available_monsters,
     available_players,
     create_session,
@@ -131,6 +132,53 @@ def player_action():
     response = {"game": session.serialize()}
     if result.get("events"):
         response["events"] = result["events"]
+    return jsonify(response)
+
+
+@app.post("/api/dice-roll")
+def dice_roll():
+    data = request.get_json(force=True)
+    game_id = data.get("game_id")
+    roller = data.get("roller")
+    ability = data.get("ability")
+    advantage = data.get("advantage", "normal")
+    dc_raw = data.get("dc")
+    proficiency_raw = data.get("proficiency", False)
+
+    if not game_id:
+        return jsonify({"error": "game_id is required"}), 400
+
+    session = _sessions.get(game_id)
+    if not session:
+        return jsonify({"error": "Game not found"}), 404
+
+    if isinstance(dc_raw, str) and not dc_raw.strip():
+        dc = None
+    elif dc_raw is None:
+        dc = None
+    else:
+        try:
+            dc = int(dc_raw)
+        except (TypeError, ValueError):
+            return jsonify({"error": "DC must be a number."}), 400
+
+    if isinstance(proficiency_raw, bool):
+        proficiency = proficiency_raw
+    else:
+        proficiency = str(proficiency_raw).lower() in {"1", "true", "yes", "on"}
+
+    try:
+        roll_result = session.perform_rule_based_roll(
+            roller=roller,
+            ability=ability,
+            proficiency=proficiency,
+            advantage=advantage,
+            dc=dc,
+        )
+    except InvalidDiceRequest as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    response = {"game": session.serialize(), "roll": roll_result}
     return jsonify(response)
 
 @app.get("/api/reset")

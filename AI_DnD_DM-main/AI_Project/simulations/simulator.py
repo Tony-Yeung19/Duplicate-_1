@@ -1,19 +1,68 @@
 from .dice import roll_dice  #Import the dice function to be used
+from .rules_engine import get_rules_engine, RulesEngine
+
+
+
+class RulesEngine:
+    """
+    Minimal damage rules:
+      - resistance halves damage
+      - vulnerability doubles damage
+    Extend as needed.
+    """
+    def modify_damage(self, attacker, attack, target) -> int:
+        dmg = int(getattr(attack, "damage", 0))
+        dtype = getattr(attack, "type", None)
+
+        # Expect lists/sets on the target; adapt if your model differs
+        res = set(getattr(target, "resistances", []) or [])
+        vul = set(getattr(target, "vulnerabilities", []) or [])
+
+        if dtype and dtype in res:
+            dmg = max(0, dmg // 2)
+        if dtype and dtype in vul:
+            dmg *= 2
+        return dmg
+
+def get_rules_engine() -> RulesEngine:
+    return RulesEngine()
+
+
 
 class CombatSimulator:
     """
     A core rules engine for handling D&D 5e combat.
     """
-    def __init__(self):
+    def __init__(self, rules =None):
         self.combat_log = []
         self.round_number = 0
         self.initiative_order = []
+        self.rules = rules or get_rules_engine()
         print("CombatSimulator initialized!")
 
     def log_event(self, message):
         """Store a combat event in the log and return the message for convenience."""
         self.combat_log.append(message)
         return message
+
+    def describe_actions(self, combatant):
+        """Return a serialisable summary of the combatant's available maneuvers."""
+        actions = []
+        for action in combatant.get('actions', []):
+            name = action.get('name')
+            if not name:
+                continue
+            actions.append({
+                'name': name,
+                'attack_bonus': action.get('attack_bonus', 0),
+                'damage_dice': action.get('damage_dice', '1d6'),
+                'damage_bonus': action.get('damage_bonus', 0),
+                'damage_type': action.get('damage_type', ''),
+                'attack_roll_bonus_dice': action.get('attack_roll_bonus_dice'),
+                'extra_damage_dice': action.get('extra_damage_dice'),
+                'description': action.get('description', ''),
+            })
+        return actions
 
     def resolve_attack(self, attacker, attack_name, target):
         """
@@ -126,6 +175,69 @@ class CombatSimulator:
         if damage_type and damage_type in vulnerabilities:
             damage = damage * 2  #Vulnerability doubles damage
         return damage
+
+    def roll_d20_test(
+        self,
+        combatant,
+        ability_name,
+        *,
+        proficiency=False,
+        dc=None,
+        advantage_state="normal",
+    ):
+        """Resolve a d20 test for ``combatant`` following the loaded rules."""
+
+        stats = combatant.get("stats", {}) or {}
+        key = ability_name.lower()
+        if key not in stats:
+            raise ValueError(f"{combatant.get('name', 'Unknown')} lacks an ability score for {ability_name}.")
+
+        score = stats[key]
+        modifier = self.rules.ability_modifier(score)
+        proficiency_bonus = self.rules.proficiency_bonus if proficiency else 0
+        kept_roll, rolls = roll_d20(advantage_state)
+        total = kept_roll + modifier + proficiency_bonus
+        success = None if dc is None else total >= dc
+
+        pretty_ability = key.capitalize()
+        advantage_state = (advantage_state or "normal").lower()
+        advantage_blurb = self.rules.advantage_summary(advantage_state)
+
+        fragments = [f"{combatant['name']} attempts a {pretty_ability} test"]
+        if advantage_state in {"advantage", "disadvantage"}:
+            fragments.append(f"rolling with {advantage_state}")
+        message = ", ".join(fragments) + "."
+        detail = (
+            f"d20: {kept_roll} (rolls: {', '.join(str(r) for r in rolls)})"
+            f", modifier {modifier:+d}"
+        )
+        if proficiency_bonus:
+            detail += f", proficiency {proficiency_bonus:+d}"
+        detail += f" ⇒ total {total}"
+        if dc is not None:
+            outcome = "success" if success else "failure"
+            detail += f" vs DC {dc} ({outcome})"
+        message = f"{message} {detail}"
+
+        rule_context = {
+            "description": self.rules.d20_description,
+            "steps": self.rules.d20_steps,
+            "advantage": advantage_blurb,
+        }
+
+        return {
+            "message": self.log_event(message),
+            "roll": kept_roll,
+            "rolls": rolls,
+            "modifier": modifier,
+            "proficiency": proficiency_bonus,
+            "total": total,
+            "dc": dc,
+            "success": success,
+            "advantage_state": advantage_state,
+            "ability": pretty_ability,
+            "rule_context": rule_context,
+        }
     
     def roll_initiative(self, combatants):
         """Roll initiative for all combatants and sort them in order."""
@@ -175,14 +287,21 @@ class CombatSimulator:
         """Handle player's turn (simplified for now)."""
         #Find all monster targets
         monsters = [c for c in combatants if c.get('type') == 'monster' and c['current_hit_points'] > 0]
-        
+
         if not monsters:
             return  # No valid targets
-        
-        #For now, just attack the first monster with the first attack
+
+        # Surface the player's available maneuvers for higher level callers
+        available_actions = self.describe_actions(player)
+        if not available_actions:
+            message = f"{player['name']} has no maneuvers available!"
+            print(self.log_event(message))
+            return
+
+        #For now, just attack the first monster with the first available maneuver
         target = monsters[0]
-        attack = player['actions'][0]['name']
-        
+        attack = available_actions[0]['name']
+
         result = self.resolve_attack(player, attack, target)
         print(result['message'])
     

@@ -28,6 +28,18 @@ const spellOptionsContainer = document.getElementById('spell-options');
 const cantripHint = document.getElementById('cantrip-hint');
 const spellHint = document.getElementById('spell-hint');
 const creationStatus = document.getElementById('creation-status');
+const heroDiceForm = document.getElementById('hero-dice-form');
+const heroDiceAbility = document.getElementById('hero-dice-ability');
+const heroDiceAdvantage = document.getElementById('hero-dice-advantage');
+const heroDiceDc = document.getElementById('hero-dice-dc');
+const heroDiceProficiency = document.getElementById('hero-dice-proficiency');
+const heroDiceResult = document.getElementById('hero-dice-result');
+const monsterDiceForm = document.getElementById('monster-dice-form');
+const monsterDiceAbility = document.getElementById('monster-dice-ability');
+const monsterDiceAdvantage = document.getElementById('monster-dice-advantage');
+const monsterDiceDc = document.getElementById('monster-dice-dc');
+const monsterDiceProficiency = document.getElementById('monster-dice-proficiency');
+const monsterDiceResult = document.getElementById('monster-dice-result');
 
 let currentGameId = null;
 let characterOptionsData = null;
@@ -491,6 +503,19 @@ function setStatus(message, isError = false) {
   statusMessage.classList.toggle('error', isError);
 }
 
+function clearDiceResults() {
+  if (heroDiceResult) {
+    heroDiceResult.textContent = '';
+    heroDiceResult.removeAttribute('title');
+    heroDiceResult.dataset.hasResult = 'false';
+  }
+  if (monsterDiceResult) {
+    monsterDiceResult.textContent = '';
+    monsterDiceResult.removeAttribute('title');
+    monsterDiceResult.dataset.hasResult = 'false';
+  }
+}
+
 function updateCard(card, data) {
   if (!data) {
     card.classList.add('hidden');
@@ -535,12 +560,15 @@ function renderActions(player, turn, winner) {
     return;
   }
 
-  const isPlayersTurn = turn && turn.type === 'player';
-  player.actions.forEach((action) => {
+  const isPlayersTurn = Boolean(turn) && (turn.type === 'player' || turn.name === player.name);
+  const currentTurnActions = new Map((turn?.actions || []).map((action) => [action.name, action]));
+  (player.actions || []).forEach((action) => {
     const button = document.createElement('button');
     button.textContent = `${action.name} (+${action.attack_bonus} | ${action.damage_dice}${action.damage_bonus ? `+${action.damage_bonus}` : ''})`;
-    button.disabled = !isPlayersTurn || Boolean(winner);
-    button.title = buildActionTooltip(action);
+    const isActionAvailable = currentTurnActions.size === 0 || currentTurnActions.has(action.name);
+    button.disabled = !isPlayersTurn || Boolean(winner) || !isActionAvailable;
+    const tooltipSource = currentTurnActions.get(action.name) || action;
+    button.title = buildActionTooltip(tooltipSource);
     button.addEventListener('click', () => executeAction(action.name));
     playerActions.appendChild(button);
   });
@@ -551,6 +579,134 @@ function abilityModifier(score) {
     return 0;
   }
   return Math.floor((score - 10) / 2);
+}
+
+function populateDiceAbilitySelect(select, stats = {}) {
+  if (!select) {
+    return [];
+  }
+
+  const previous = select.value;
+  select.innerHTML = '';
+
+  const available = Object.entries(ABILITY_LABELS)
+    .filter(([key]) => stats && typeof stats[key] === 'number')
+    .map(([key, label]) => ({ key, label, score: stats[key] }));
+
+  if (!available.length) {
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'No abilities available';
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
+    select.disabled = true;
+    return [];
+  }
+
+  available.forEach(({ key, label, score }) => {
+    const option = document.createElement('option');
+    const mod = abilityModifier(score);
+    option.value = key;
+    option.textContent = `${label} (${score}${mod >= 0 ? `, +${mod}` : `, ${mod}`})`;
+    select.appendChild(option);
+  });
+
+  select.disabled = false;
+  const match = available.find(({ key }) => key === previous);
+  select.value = match ? match.key : available[0].key;
+  return available;
+}
+
+function updateDicePanel(form, abilitySelect, stats = {}, resultField) {
+  if (!form || !abilitySelect) {
+    return;
+  }
+
+  const available = populateDiceAbilitySelect(abilitySelect, stats);
+  const enabled = available.length > 0;
+  const controls = form.querySelectorAll('select, input, button');
+  controls.forEach((control) => {
+    control.disabled = !enabled;
+  });
+
+  if (!enabled && resultField) {
+    resultField.textContent = 'No ability scores available for dice rolls.';
+    resultField.dataset.hasResult = 'true';
+    resultField.title = '';
+  } else if (resultField && resultField.dataset.hasResult !== 'true') {
+    resultField.textContent = '';
+    resultField.title = '';
+  }
+}
+
+function renderDicePanels(hero, monster) {
+  if (heroDiceForm && heroDiceAbility) {
+    updateDicePanel(heroDiceForm, heroDiceAbility, hero?.stats || {}, heroDiceResult);
+  }
+  if (monsterDiceForm && monsterDiceAbility) {
+    updateDicePanel(monsterDiceForm, monsterDiceAbility, monster?.stats || {}, monsterDiceResult);
+  }
+}
+
+function displayDiceResult(roller, roll) {
+  const target = roller === 'player' ? heroDiceResult : monsterDiceResult;
+  if (!target) {
+    return;
+  }
+
+  if (!roll) {
+    target.textContent = '';
+    target.dataset.hasResult = 'false';
+    target.removeAttribute('title');
+    return;
+  }
+
+  const summaryParts = [];
+  if (roll.roller) {
+    summaryParts.push(roll.roller);
+  }
+  if (roll.ability) {
+    summaryParts.push(`${roll.ability} test`);
+  }
+  const summary = summaryParts.length ? summaryParts.join(' — ') : 'Dice result';
+
+  const detailParts = [];
+  if (Array.isArray(roll.rolls) && roll.rolls.length > 1) {
+    detailParts.push(`rolls ${roll.rolls.join(', ')} (kept ${roll.roll})`);
+  } else if (typeof roll.roll === 'number') {
+    detailParts.push(`roll ${roll.roll}`);
+  }
+  if (typeof roll.modifier === 'number') {
+    detailParts.push(`modifier ${roll.modifier >= 0 ? `+${roll.modifier}` : roll.modifier}`);
+  }
+  if (typeof roll.proficiency === 'number' && roll.proficiency) {
+    detailParts.push(`proficiency +${roll.proficiency}`);
+  }
+  if (typeof roll.total === 'number') {
+    detailParts.push(`total ${roll.total}`);
+  }
+  if (typeof roll.dc === 'number') {
+    detailParts.push(`DC ${roll.dc}`);
+  }
+  if (typeof roll.success === 'boolean') {
+    detailParts.push(roll.success ? 'success' : 'failure');
+  }
+
+  target.textContent = `${summary}: ${detailParts.join(', ')}`;
+  target.dataset.hasResult = 'true';
+
+  const tooltip = [];
+  if (roll.rule_context?.description) {
+    tooltip.push(roll.rule_context.description);
+  }
+  if (Array.isArray(roll.rule_context?.steps) && roll.rule_context.steps.length) {
+    tooltip.push(`Steps: ${roll.rule_context.steps.join(' › ')}`);
+  }
+  if (roll.rule_context?.advantage) {
+    tooltip.push(roll.rule_context.advantage);
+  }
+  target.title = tooltip.join('\n');
 }
 
 function renderAbilityScores(container, stats = {}) {
@@ -611,6 +767,7 @@ function renderGame(game) {
   const foe = game.monsters[0];
   updateCard(playerCard, hero);
   updateCard(monsterCard, foe);
+  renderDicePanels(hero, foe);
   renderActions(hero, game.turn, game.winner);
   renderLog(game.log, game.winner);
   roundNumber.textContent = game.round;
@@ -664,7 +821,67 @@ async function executeAction(actionName) {
     }
   }
 }
+async function handleDiceRoll(event, roller) {
+  event.preventDefault();
+  if (!currentGameId) {
+    setStatus('Start an encounter before rolling dice.', true);
+    return;
+  }
 
+  const abilitySelect = roller === 'player' ? heroDiceAbility : monsterDiceAbility;
+  const advantageSelect = roller === 'player' ? heroDiceAdvantage : monsterDiceAdvantage;
+  const dcInput = roller === 'player' ? heroDiceDc : monsterDiceDc;
+  const proficiencyToggle = roller === 'player' ? heroDiceProficiency : monsterDiceProficiency;
+
+  if (!abilitySelect || abilitySelect.disabled || !abilitySelect.value) {
+    setStatus('Select an ability score to roll.', true);
+    return;
+  }
+
+  const payload = {
+    game_id: currentGameId,
+    roller,
+    ability: abilitySelect.value,
+    advantage: advantageSelect ? advantageSelect.value : 'normal',
+    proficiency: Boolean(proficiencyToggle && proficiencyToggle.checked),
+  };
+
+  if (dcInput && dcInput.value) {
+    const parsed = Number.parseInt(dcInput.value, 10);
+    if (Number.isNaN(parsed)) {
+      setStatus('DC must be a number.', true);
+      return;
+    }
+    payload.dc = parsed;
+  }
+
+  try {
+    const response = await fetch('/api/dice-roll', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Dice roll failed');
+    }
+    if (data.game) {
+      renderGame(data.game);
+    }
+    displayDiceResult(roller, data.roll);
+  } catch (error) {
+    console.error('Dice roll error', error);
+    setStatus(error.message, true);
+  }
+}
+
+if (heroDiceForm) {
+  heroDiceForm.addEventListener('submit', (event) => handleDiceRoll(event, 'player'));
+}
+
+if (monsterDiceForm) {
+  monsterDiceForm.addEventListener('submit', (event) => handleDiceRoll(event, 'monster'));
+}
 startButton.addEventListener('click', async () => {
   const playerId = playerSelect.value;
   const monsterId = monsterSelect.value;
@@ -674,6 +891,7 @@ startButton.addEventListener('click', async () => {
   }
 
   startButton.disabled = true;
+  clearDiceResults();
   setStatus('The Dungeon Master arranges the battle map...');
   if (narrator) {
     narrator.classList.remove('hidden');

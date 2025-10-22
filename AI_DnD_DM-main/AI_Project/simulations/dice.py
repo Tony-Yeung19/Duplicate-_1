@@ -1,6 +1,31 @@
 import random
 import re
 
+
+def roll_die(sides: int) -> int:
+    """Roll a single die with ``sides`` faces and return the result."""
+
+    if sides < 2:
+        raise ValueError("Dice must have at least 2 sides.")
+    return random.randint(1, sides)
+
+
+def roll_d20(advantage_state: str = "normal") -> tuple[int, list[int]]:
+    """Roll a d20 honouring advantage/disadvantage rules.
+
+    Returns a tuple of ``(kept_result, all_rolls)``.
+    """
+
+    advantage_state = (advantage_state or "normal").lower()
+    if advantage_state == "advantage":
+        rolls = [roll_die(20), roll_die(20)]
+        return max(rolls), rolls
+    if advantage_state == "disadvantage":
+        rolls = [roll_die(20), roll_die(20)]
+        return min(rolls), rolls
+    result = roll_die(20)
+    return result, [result]
+
 def roll_dice(dice_string):
 
     """
@@ -56,7 +81,7 @@ def roll_dice(dice_string):
     #Roll the dice!
     total = 0
     for _ in range(num_dice):
-        roll = random.randint(1, sides)
+        roll = roll_die(sides)
         total += roll
     
     #Apply the modifier
