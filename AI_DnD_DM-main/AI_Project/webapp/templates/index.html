@@ -2,223 +2,78 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>D&D Combat Arena</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Dungeon Master Arena</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   </head>
   <body>
-    <header>
-      <div class="sigil" aria-hidden="true">⚔️</div>
-      <h1>D&amp;D Combat Arena</h1>
-      <p class="tagline">Summon a hero, confront a monster, and let the d20 decide destiny.</p>
+    <header class="site-header">
+      <div class="sigil" aria-hidden="true">🜂</div>
+      <div class="site-title">
+        <h1>AI Dungeon Master Arena</h1>
+        <p>Assemble a party, challenge monsters, and narrate your own legend.</p>
+      </div>
     </header>
 
-    <main>
-      <section class="selection-panel">
-        <div class="selector">
-          <label for="player-select">Select your hero</label>
-          <select id="player-select"></select>
-        </div>
-        <div class="selector">
-          <label for="monster-select">Select a monster</label>
-          <select id="monster-select"></select>
-        </div>
-        <button id="start-game">Start Encounter</button>
-        <p id="status-message" class="status"></p>
-      </section>
-
-            <section class="creation-panel">
-        <div class="creation-header">
-          <h2>Forged Heroes</h2>
-          <p>Create a new character using the same rules as the simulator.</p>
-        </div>
-        <form id="character-form">
-          <div class="form-grid">
-            <label class="form-field">
-              <span>Name</span>
-              <input id="creator-name" name="name" type="text" placeholder="E.g. Nyssa the Bold" required />
-            </label>
-
-            <label class="form-field">
-              <span>Class</span>
-              <select id="creator-class" name="class" required></select>
-            </label>
-
-            <label class="form-field">
-              <span>Ability Method</span>
-              <div class="ability-controls">
-                <select id="ability-method" name="ability_method"></select>
-                <button type="button" id="roll-abilities" class="secondary">Roll</button>
-              </div>
-            </label>
-
-            <label class="form-field" id="pack-field">
-              <span>Adventuring Pack</span>
-              <select id="pack-select" name="pack"></select>
-            </label>
-
-            <label class="form-field">
-              <span>Weapon</span>
-              <select id="weapon-select" name="weapon"></select>
-            </label>
-
-            <label class="form-field">
-              <span>Armor / Shield</span>
-              <select id="armor-select" name="armor"></select>
-            </label>
-          </div>
-
-          <fieldset id="ability-fieldset">
-            <legend>Ability Scores</legend>
-            <div class="ability-grid" id="ability-inputs"></div>
+    <main class="layout">
+      <section id="setup-panel" class="card">
+        <h2>Summon the Encounter</h2>
+        <p class="hint">Pick your heroes and foes, then let the AI Dungeon Master take over.</p>
+        <form id="setup-form" autocomplete="off">
+          <fieldset>
+            <legend>Heroes</legend>
+            <div id="character-options" class="option-list"></div>
+            <p class="hint">Select up to four adventurers from your roster.</p>
           </fieldset>
 
-          <fieldset id="skill-fieldset">
-            <legend>Skills</legend>
-            <p id="skill-hint" class="hint"></p>
-            <div id="skill-options" class="option-grid"></div>
+          <fieldset>
+            <legend>Monsters</legend>
+            <div id="monster-options" class="option-list"></div>
+            <p class="hint">Choose one or more opponents to face the party.</p>
           </fieldset>
 
-          <fieldset id="spell-fieldset" class="hidden">
-            <legend>Spells</legend>
-            <div class="spell-group">
-              <h3>Cantrips</h3>
-              <p class="hint" id="cantrip-hint"></p>
-              <div id="cantrip-options" class="option-grid"></div>
-            </div>
-            <div class="spell-group">
-              <h3>Level 1 Spells</h3>
-              <p class="hint" id="spell-hint"></p>
-              <div id="spell-options" class="option-grid"></div>
-            </div>
-          </fieldset>
-
-          <label class="form-field">
-            <span>Character Bio (optional)</span>
-            <textarea id="creator-description" name="description" rows="3" placeholder="Describe your hero's tale..."></textarea>
+          <label class="environment-field">
+            <span>Battlefield</span>
+            <input id="environment-input" type="text" placeholder="Ancient Ruins" />
           </label>
 
-          <div class="form-actions">
-            <button type="submit" id="create-character">Save Character</button>
-            <p id="creation-status" class="status"></p>
-          </div>
+          <button type="submit" class="primary">Begin Encounter</button>
+          <p id="setup-status" class="status-message" role="status"></p>
         </form>
       </section>
 
-      <p id="narrator-callout" class="narrator hidden">Choose your champions to begin the tale.</p>
-
-      <section id="battlefield" class="hidden">
-        <div class="combatants">
-          <article class="card" id="player-card">
-            <div class="card-header">
-              <h2 class="card-title">Hero</h2>
-              <span class="card-subtitle">Adventurer Sheet</span>
-            </div>
-            <div class="stats">
-              <p><strong>Name:</strong> <span data-field="name"></span></p>
-              <p><strong>Class:</strong> <span data-field="class"></span></p>
-              <p><strong>HP:</strong> <span data-field="hp"></span></p>
-              <p><strong>AC:</strong> <span data-field="ac"></span></p>
-            </div>
-            <div class="ability-scores" data-field="stats"></div>
-            <p class="description" data-field="description"></p>
-            <div class="actions">
-              <h3>Battle Maneuvers</h3>
-              <div id="player-actions" class="action-buttons"></div>
-            </div>
-                        <div class="dice-panel">
-              <h3>Heroic Dice</h3>
-              <form id="hero-dice-form" class="dice-form">
-                <div class="dice-row">
-                  <label>
-                    <span>Ability</span>
-                    <select id="hero-dice-ability" disabled></select>
-                  </label>
-                  <label>
-                    <span>Advantage</span>
-                    <select id="hero-dice-advantage" disabled>
-                      <option value="normal" selected>Normal</option>
-                      <option value="advantage">Advantage</option>
-                      <option value="disadvantage">Disadvantage</option>
-                    </select>
-                  </label>
-                </div>
-                <div class="dice-row">
-                  <label>
-                    <span>DC (optional)</span>
-                    <input id="hero-dice-dc" type="number" min="1" placeholder="e.g. 15" disabled />
-                  </label>
-                  <label class="dice-toggle">
-                    <input id="hero-dice-proficiency" type="checkbox" disabled />
-                    <span>Add proficiency (+2)</span>
-                  </label>
-                </div>
-                <button type="submit" disabled>Roll Test</button>
-              </form>
-              <p id="hero-dice-result" class="dice-result"></p>
-            </div>
-          </article>
-
-          <article class="card" id="monster-card">
-            <div class="card-header">
-              <h2 class="card-title">Monster</h2>
-              <span class="card-subtitle">Dungeon Foe</span>
-            </div>
-            <div class="stats">
-              <p><strong>Name:</strong> <span data-field="name"></span></p>
-              <p><strong>HP:</strong> <span data-field="hp"></span></p>
-              <p><strong>AC:</strong> <span data-field="ac"></span></p>
-            </div>
-            <div class="ability-scores" data-field="stats"></div>
-            <p class="description" data-field="description"></p>
-                        <div class="dice-panel">
-              <h3>Monster Dice</h3>
-              <form id="monster-dice-form" class="dice-form">
-                <div class="dice-row">
-                  <label>
-                    <span>Ability</span>
-                    <select id="monster-dice-ability" disabled></select>
-                  </label>
-                  <label>
-                    <span>Advantage</span>
-                    <select id="monster-dice-advantage" disabled>
-                      <option value="normal" selected>Normal</option>
-                      <option value="advantage">Advantage</option>
-                      <option value="disadvantage">Disadvantage</option>
-                    </select>
-                  </label>
-                </div>
-                <div class="dice-row">
-                  <label>
-                    <span>DC (optional)</span>
-                    <input id="monster-dice-dc" type="number" min="1" placeholder="e.g. 13" disabled />
-                  </label>
-                  <label class="dice-toggle">
-                    <input id="monster-dice-proficiency" type="checkbox" disabled />
-                    <span>Add proficiency (+2)</span>
-                  </label>
-                </div>
-                <button type="submit" disabled>Roll Test</button>
-              </form>
-              <p id="monster-dice-result" class="dice-result"></p>
-            </div>
-          </article>
+      <section id="game-area" class="card hidden" aria-live="polite">
+        <div class="status-bar">
+          <div>
+            <span id="combat-round" class="status-pill"></span>
+            <span id="current-turn" class="status-pill"></span>
+          </div>
+          <div id="victory-banner" class="status-pill"></div>
         </div>
 
-        <aside class="turn-info">
-          <p><strong>Current Round:</strong> <span id="round-number">1</span></p>
-          <p><strong>Active Combatant:</strong> <span id="active-turn">-</span></p>
-        </aside>
+        <div class="combatants">
+          <div class="combat-column">
+            <h3>Heroes</h3>
+            <ul id="hero-list" class="combatant-list"></ul>
+          </div>
+          <div class="combat-column">
+            <h3>Monsters</h3>
+            <ul id="monster-list" class="combatant-list"></ul>
+          </div>
+        </div>
 
-        <section class="log">
-          <h2>Combat Log</h2>
-          <ul id="log-list"></ul>
-        </section>
+        <div id="event-log" class="log" aria-live="polite"></div>
+
+        <form id="action-form" class="action-form">
+          <label>
+            <span>Declare your move</span>
+            <textarea id="action-input" rows="3" placeholder="I charge the goblin and swing my sword."></textarea>
+          </label>
+          <button type="submit" class="primary">Send Action</button>
+        </form>
+        <p id="action-status" class="status-message" role="status"></p>
       </section>
     </main>
-
-    <footer>
-      <p>Forged with Flask, HTML, and CSS—yet the dice still heed the simulator's call.</p>
-    </footer>
 
     <script src="{{ url_for('static', filename='app.js') }}" defer></script>
   </body>
