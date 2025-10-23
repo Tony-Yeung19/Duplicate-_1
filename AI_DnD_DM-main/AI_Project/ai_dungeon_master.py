@@ -1,25 +1,61 @@
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+"""Utility helpers for translating game state into AI Dungeon Master responses."""
+
+from __future__ import annotations
+
 import json
 import re
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+try:  # pragma: no cover - optional heavy dependencies
+    import torch
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+except Exception:  # ImportError or runtime issues when torch isn't available
+    torch = None
+    AutoModelForCausalLM = AutoTokenizer = None
+
+
+def _safe_lower(value: Optional[str]) -> str:
+    return value.lower() if isinstance(value, str) else ""
 
 class AIDungeonMaster:
-    def __init__(self, model_path):
-        self.model_path = model_path
+    """Lightweight wrapper around an LLM (or a deterministic stub)."""
+
+    def __init__(self, model_path: Optional[str] = None):
+        self.model_path = Path(model_path) if model_path else None
         self.tokenizer = None
         self.model = None
+        self.model_available = False
         self.load_model()
-        
+
     def load_model(self):
         """Load your trained AI model"""
+        if self.model_path is None:
+            return
+
+        if AutoTokenizer is None or AutoModelForCausalLM is None or torch is None:
+            print("AI Dungeon Master running in stub mode: transformers not available.")
+            return
+
+        if not self.model_path.exists():
+            print(f"AI Dungeon Master stub mode: model path {self.model_path} missing.")
+            return
+
         print("Loading AI Dungeon Master...")
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_path)
-        self.model = AutoModelForCausalLM.from_pretrained(self.model_path)
-        
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = self.tokenizer.eos_token
-            
-        print("AI Dungeon Master loaded!")
+        try:
+            self.tokenizer = AutoTokenizer.from_pretrained(str(self.model_path))
+            self.model = AutoModelForCausalLM.from_pretrained(str(self.model_path))
+
+            if self.tokenizer.pad_token is None:
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+
+            self.model_available = True
+            print("AI Dungeon Master loaded!")
+        except Exception as exc:  # pragma: no cover - defensive
+            print(f"Failed to load AI model ({exc}); falling back to stub mode.")
+            self.tokenizer = None
+            self.model = None
+            self.model_available = False
     
     def create_game_state_prompt(self, game_state, player_action):
         """Create prompt that guides the AI to generate better responses"""
@@ -102,49 +138,110 @@ DM RESPONSE:"""
     
     def generate_response(self, game_state, player_action, max_length=200):
         """Generate AI DM response with proper error handling - FIXED REPETITION"""
+        if not self.model_available or self.tokenizer is None or self.model is None:
+            return self._generate_stub_response(game_state, player_action)
+
         try:
             print(f"DEBUG: Generating response for action: {player_action}")
             prompt = self.create_game_state_prompt(game_state, player_action)
             print(f"DEBUG: Prompt created successfully")
-            
+
             inputs = self.tokenizer(prompt, return_tensors="pt", max_length=512, truncation=True)
             print(f"DEBUG: Inputs tokenized successfully")
-            
+
             with torch.no_grad():
                 outputs = self.model.generate(
                     **inputs,
                     max_new_tokens=max_length,
-                    temperature=0.8,  #Increased for more variety
+                    temperature=0.8,  # Increased for more variety
                     do_sample=True,
                     pad_token_id=self.tokenizer.eos_token_id,
-                    repetition_penalty=1.5,  #Increased to reduce repetition
-                    top_p=0.92,  #Adjusted for better sampling
-                    top_k=50,    #Added to limit vocabulary choices
-                    no_repeat_ngram_size=3  #Prevent repeating 3-grams
+                    repetition_penalty=1.5,  # Increased to reduce repetition
+                    top_p=0.92,  # Adjusted for better sampling
+                    top_k=50,  # Added to limit vocabulary choices
+                    no_repeat_ngram_size=3,  # Prevent repeating 3-grams
                 )
             print(f"DEBUG: Model generation completed")
-            
+
             response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
             print(f"DEBUG: Raw model response: {response}")
-            
-            #Extract just the response part
+
+            # Extract just the response part
             if "DM RESPONSE:" in response:
                 response = response.split("DM RESPONSE:")[1].strip()
             elif "Response:" in response:
                 response = response.split("Response:")[1].strip()
-            
+
             return self.parse_dm_response(response)
-            
-        except Exception as e:
+
+        except Exception as e:  # pragma: no cover - defensive guard
             print(f"DEBUG: Error in generate_response: {e}")
             import traceback
+
             print(f"DEBUG: Traceback: {traceback.format_exc()}")
-            #Return a fallback response
+            # Return a fallback response
             return {
-                'commands': [],
-                'narration': f"The DM is considering your action: '{player_action}'",
-                'raw_response': f"Error: {e}"
+                "commands": [],
+                "narration": f"The DM is considering your action: '{player_action}'",
+                "raw_response": f"Error: {e}",
             }
+
+    # Existing methods remain unchanged below
+
+    def _generate_stub_response(self, game_state: Dict[str, Any], player_action: str) -> Dict[str, Any]:
+        """Deterministic narrative for environments without a language model."""
+
+        actor_name = game_state.get("current_turn") or "The adventurer"
+        target = self._select_target_name(game_state)
+        commands: List[str] = []
+
+        action_lower = _safe_lower(player_action)
+        if target and any(word in action_lower for word in ["attack", "strike", "swing", "shoot"]):
+            commands.append(f"!attack basic -t {target}")
+        elif target and any(word in action_lower for word in ["cast", "spell", "magic"]):
+            spell_name = self._extract_spell_name(player_action) or "MagicMissile"
+            commands.append(f"!cast {spell_name} -t {target}")
+        elif any(word in action_lower for word in ["check", "perception", "investigate", "look"]):
+            commands.append("!check perception")
+        elif any(word in action_lower for word in ["dodge", "defend", "hide"]):
+            commands.append("!move defensively")
+
+        narration = self._build_stub_narration(actor_name, target, player_action, commands)
+        raw_response = f"COMMANDS: {', '.join(commands)}\nNARRATION: {narration}" if commands else f"NARRATION: {narration}"
+        return {"commands": commands, "narration": narration, "raw_response": raw_response}
+
+    def _select_target_name(self, game_state: Dict[str, Any]) -> Optional[str]:
+        monsters = game_state.get("monsters") or []
+        for monster in monsters:
+            hp = monster.get("current_hp") or monster.get("hit_points") or monster.get("hp")
+            if hp is None or hp > 0:
+                return monster.get("name")
+        characters = game_state.get("characters") or []
+        for character in characters:
+            hp = character.get("hit_points") or character.get("current_hit_points")
+            if hp is None or hp > 0:
+                return character.get("name")
+        return None
+
+    def _extract_spell_name(self, text: str) -> Optional[str]:
+        match = re.search(r"cast\s+([a-zA-Z][a-zA-Z\s']+)", text, flags=re.IGNORECASE)
+        if match:
+            return match.group(1).strip().replace(" ", "")
+        return None
+
+    def _build_stub_narration(
+        self, actor_name: str, target_name: Optional[str], action_text: str, commands: List[str]
+    ) -> str:
+        if commands:
+            if target_name:
+                return (
+                    f"{actor_name} acts decisively against {target_name}, responding to the declaration: "
+                    f"'{action_text}'."
+                )
+            return f"{actor_name} follows through on the plan: '{action_text}'."
+        if target_name:
+            return f"{actor_name} sizes up {target_name}, but no immediate action resolves."
+        return f"{actor_name} considers the surroundings cautiously."
     
     def parse_dm_response(self, response):
         """Parse AI response according to your training data format"""
