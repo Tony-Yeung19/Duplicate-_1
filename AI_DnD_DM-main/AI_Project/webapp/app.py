@@ -1,27 +1,19 @@
-"""Flask application exposing the combat simulator via a web UI."""
+"""Flask application exposing the AI Dungeon Master via a web UI."""
 from __future__ import annotations
 
 from flask import Flask, jsonify, render_template, request
 
-from AI_Project.player.character_engine import (
-    CharacterCreationError,
-    build_character,
-    character_options,
-    load_saved_characters,
-    roll_ability_scores,
-    save_character,
-)
-
 from .game_manager import (
     GameError,
-    InvalidDiceRequest,
+    apply_player_action,
+    available_characters,
     available_monsters,
-    available_players,
     create_session,
+    get_session,
+    reset_sessions,
 )
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-_sessions = {}
 
 
 @app.route("/")
@@ -29,86 +21,35 @@ def index():
     return render_template("index.html")
 
 
-@app.get("/api/players")
-def get_players():
-    return jsonify({"players": available_players()})
+@app.get("/api/setup")
+def get_setup():
+    return jsonify({"characters": available_characters(), "monsters": available_monsters()})
 
 
-@app.get("/api/monsters")
-def get_monsters():
-    return jsonify({"monsters": available_monsters()})
-
-@app.get("/api/character-options")
-def get_character_options():
-    return jsonify(character_options())
-
-
-@app.get("/api/characters")
-def get_custom_characters():
-    characters = [
-        {
-            "id": char["id"],
-            "name": char["name"],
-            "class": char.get("class"),
-            "max_hit_points": char.get("max_hit_points", char.get("hit_points", 0)),
-            "armor_class": char.get("armor_class"),
-        }
-        for char in load_saved_characters()
-    ]
-    return jsonify({"characters": characters})
-
-
-@app.post("/api/character-abilities")
-def post_character_abilities():
-    data = request.get_json(force=True)
-    method = data.get("method")
-    if not method:
-        return jsonify({"error": "method is required"}), 400
-    try:
-        scores = roll_ability_scores(method)
-    except CharacterCreationError as exc:
-        return jsonify({"error": str(exc)}), 400
-    return jsonify({"method": method, "scores": scores})
-
-
-@app.post("/api/characters")
-def create_character_endpoint():
-    payload = request.get_json(force=True)
-    try:
-        character = build_character(payload)
-        character = save_character(character)
-    except CharacterCreationError as exc:
-        return jsonify({"error": str(exc)}), 400
-    summary = {
-        "id": character["id"],
-        "name": character["name"],
-        "class": character.get("class"),
-        "max_hit_points": character.get("max_hit_points", character.get("hit_points", 0)),
-        "armor_class": character.get("armor_class"),
-    }
-    return jsonify({"character": summary})
 @app.post("/api/start-game")
 def start_game():
     data = request.get_json(force=True)
-    player_id = data.get("player_id")
-    monster_id = data.get("monster_id")
-    if not player_id or not monster_id:
-        return jsonify({"error": "player_id and monster_id are required"}), 400
+    character_ids = data.get("character_ids") or []
+    monster_ids = data.get("monster_ids") or []
+    environment = data.get("environment")
+
+    if not character_ids or not monster_ids:
+        return jsonify({"error": "Select at least one character and one monster."}), 400
 
     try:
-        session = create_session(player_id, monster_id)
+        session = create_session(character_ids, monster_ids, environment)
     except GameError as exc:
         return jsonify({"error": str(exc)}), 400
 
-    _sessions[session.id] = session
     return jsonify({"game": session.serialize()})
 
 
 @app.get("/api/game/<game_id>")
 def get_game(game_id: str):
-    session = _sessions.get(game_id)
-    if not session:
-        return jsonify({"error": "Game not found"}), 404
+    try:
+        session = get_session(game_id)
+    except GameError as exc:
+        return jsonify({"error": str(exc)}), 404
     return jsonify({"game": session.serialize()})
 
 
@@ -116,74 +57,26 @@ def get_game(game_id: str):
 def player_action():
     data = request.get_json(force=True)
     game_id = data.get("game_id")
-    action_name = data.get("action_name")
-    if not game_id or not action_name:
-        return jsonify({"error": "game_id and action_name are required"}), 400
+    action_text = data.get("action")
+    actor = data.get("actor")
 
-    session = _sessions.get(game_id)
-    if not session:
-        return jsonify({"error": "Game not found"}), 404
+    if not game_id or not action_text:
+        return jsonify({"error": "game_id and action are required"}), 400
 
     try:
-         result = session.player_action(action_name) or {}
+        result = apply_player_action(game_id, action_text, actor)
+        session = get_session(game_id)
     except GameError as exc:
-        return jsonify({"error": str(exc)}), 400
+        status_code = 404 if "not found" in str(exc).lower() else 400
+        return jsonify({"error": str(exc)}), status_code
 
-    response = {"game": session.serialize()}
-    if result.get("events"):
-        response["events"] = result["events"]
+    response = {"game": session.serialize(), **result}
     return jsonify(response)
 
-
-@app.post("/api/dice-roll")
-def dice_roll():
-    data = request.get_json(force=True)
-    game_id = data.get("game_id")
-    roller = data.get("roller")
-    ability = data.get("ability")
-    advantage = data.get("advantage", "normal")
-    dc_raw = data.get("dc")
-    proficiency_raw = data.get("proficiency", False)
-
-    if not game_id:
-        return jsonify({"error": "game_id is required"}), 400
-
-    session = _sessions.get(game_id)
-    if not session:
-        return jsonify({"error": "Game not found"}), 404
-
-    if isinstance(dc_raw, str) and not dc_raw.strip():
-        dc = None
-    elif dc_raw is None:
-        dc = None
-    else:
-        try:
-            dc = int(dc_raw)
-        except (TypeError, ValueError):
-            return jsonify({"error": "DC must be a number."}), 400
-
-    if isinstance(proficiency_raw, bool):
-        proficiency = proficiency_raw
-    else:
-        proficiency = str(proficiency_raw).lower() in {"1", "true", "yes", "on"}
-
-    try:
-        roll_result = session.perform_rule_based_roll(
-            roller=roller,
-            ability=ability,
-            proficiency=proficiency,
-            advantage=advantage,
-            dc=dc,
-        )
-    except InvalidDiceRequest as exc:
-        return jsonify({"error": str(exc)}), 400
-
-    response = {"game": session.serialize(), "roll": roll_result}
-    return jsonify(response)
 
 @app.get("/api/reset")
 def reset_games():
-    _sessions.clear()
+    reset_sessions()
     return jsonify({"status": "reset"})
 
 
